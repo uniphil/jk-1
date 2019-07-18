@@ -497,47 +497,120 @@ class App(tk.Frame):
         self.pro_count["textvariable"] = self.pro_frames
 
 
-class ReelInfo(tk.Frame):
-    def __init__(self, master, reel):
-        tk.Frame.__init__(self, master, borderwidth=2, relief='solid')
+class LoadReelPopup(tk.Toplevel):
+    def __init__(self, device, reel, close):
+        tk.Toplevel.__init__(self)
+        self.title('Load {} reel...'.format(device))
+        self.close = close
+
+        description_label = tk.Label(self, text='Description')
+        description_label.pack()
+        self.description = tk.Entry(self)
+        self.description.pack()
+
+        total_frames_label = tk.Label(self, text='Total frames')
+        total_frames_label.pack()
+        self.total_frames = tk.Entry(self)
+        self.total_frames.pack()
+
+        current_frame_label = tk.Label(self, text='Current frame')
+        current_frame_label.pack()
+        self.current_frame = tk.Entry(self)
+        self.current_frame.pack()
+
+        buttons = tk.Frame(self)
+        buttons.pack(side='bottom')
+        cancel = tk.Button(buttons, text='Cancel', command=self.cancel)
+        cancel.pack(side='left')
+        save = tk.Button(buttons, text='Save', command=self.save)
+        save.pack(side='right')
+
+    def cancel(self):
+        self.close(None)
+
+    def save(self):
+        now = int(time.time())
+        description = self.description.get()
+        total_frames = int(self.total_frames.get())
+        current_frame = int(self.current_frame.get())
+        new_reel = Reel(now, description, total_frames, current_frame)
+        self.close(new_reel)
+
+
+class ReelInfo(tk.LabelFrame):
+    def __init__(self, master, device, reel, update_reel):
+        tk.LabelFrame.__init__(self, master, relief='solid', borderwidth=2)
+        self.device = device
         self.reel = reel
+        self.update_reel = update_reel
         self.create_widgets()
 
     def create_widgets(self):
-        description = tk.Label(
-            master=self, text='Reel: {}'.format(self.reel.description))
-        description.pack(side='top')
-        loaded = tk.Label(
-            master=self, text=time.ctime(self.reel.loaded_at))
-        loaded.pack(side='top')
+        top = tk.Frame()
+        top.pack(fill='x')
+        label = tk.Label(top, text='{} reel: {}'.format(
+            self.device, self.reel.description))
+        label.pack(side='left')
+        load_reel = tk.Button(top, text='load', command=self.load_reel)
+        load_reel.pack(side='right')
+        self.config(labelwidget=top)
 
-        count = tk.Frame(master=self)
-        film_frame = tk.Label(master=count, text='frame {} (of {})'.format(
+        count = tk.Frame(self)
+        film_frame = tk.Label(count, text='frame {} (of {})'.format(
             self.reel.current_frame, self.reel.total_frames))
-        film_frame_edit = tk.Button(master=count, text='edit')
+        film_frame_edit = tk.Button(
+            count, text='edit', command=self.edit_count)
         film_frame.pack(side='left')
         film_frame_edit.pack(side='right')
         count.pack(side='top')
 
-        load_reel = tk.Button(master=self, text='load new reel')
-        load_reel.pack(side='bottom')
+        loaded = tk.Label(
+            self, text=time.ctime(self.reel.loaded_at))
+        loaded.pack(side='top')
+
+    def edit_count(self):
+        fr = tk.Frame(None)
+        b = tk.Button(fr)
+        b.pack(side='bottom')
+        fr.pack()
+
+    def load_reel(self):
+        self.pop = LoadReelPopup(self.device, self.reel, self.close_load_popup)
+
+    def close_load_popup(self, reel):
+        if reel is not None:
+            self.update_reel(reel)
+        self.pop.destroy()
 
 
 class A2(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
-
         self.camera_reel = Reel(1555456657, 'test cam', 1800, 1)
         self.projector_reel = Reel(1555456657, 'test pro', 2400, 870)
-
-        self.pack()
         self.create_widgets()
+        self.pack(fill='both')
 
     def create_widgets(self):
-        camera = ReelInfo(self, self.camera_reel)
-        camera.pack(side='left')
-        projector = ReelInfo(self, self.projector_reel)
-        projector.pack(side='right')
+        self.camera_reel_widget = ReelInfo(
+            self, 'Camera', self.camera_reel, self.update_camera_reel)
+        self.camera_reel_widget.pack(side='left')
+        self.projector_reel_widget = ReelInfo(
+            self, 'Projector', self.projector_reel, self.update_projector_reel)
+        self.projector_reel_widget.pack(side='right')
+
+    def update_widgets(self):
+        self.camera_reel_widget.destroy()
+        self.projector_reel_widget.destroy()
+        self.create_widgets()
+
+    def update_camera_reel(self, reel):
+        self.camera_reel = reel
+        self.update_widgets()
+
+    def update_projector_reel(self, reel):
+        self.projector_reel = reel
+        self.update_widgets()
 
     def heya(self):
         print 'sup', self
