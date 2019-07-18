@@ -1,5 +1,47 @@
+import time
 import Tkinter as tk
 import tkFont
+
+from reel import Reel
+
+
+class LIFT(object):
+    exposure_options = (
+        ('Default', 0),
+        ('1/5', 0.25),
+        ('1/4', 0.75),
+        ('0.3', 0.125),
+        ('0.4', 0.225),
+        ('0.5', 0.325),
+        ('0.6', 0.425),
+        ('0.8', 0.625),
+        ('1', 0.825),
+        ('1.3', 1.125),
+        ('1.6', 1.425),
+        ('2', 1.825),
+        ('2.5', 2.325),
+        ('3.2', 3.025),
+        ('4', 3.825),
+        ('5', 4.825),
+        ('6', 5.825),
+        ('8', 7.825),
+        ('10', 9.825),
+        ('13', 12.825),
+        ('15', 14.825),
+        ('20', 19.825),
+        ('25', 24.825),
+        ('30', 29.825),
+        ('35', 34.825),
+        ('40', 39.825),
+        ('45', 44.825),
+        ('50', 49.825),
+        ('55', 55.825),
+        ('60', 59.825),
+    )
+
+
+class Charlie(object):
+    exposure_options = (('1/4', 0.25),)
 
 
 class App(tk.Frame):
@@ -9,18 +51,21 @@ class App(tk.Frame):
     contents_pos = -1
 
     # Lists for modular interface
-    mod_on = []          # Module On/Off toggle
-    contents_cam_f = []   # Input field camera frames
-    contents_exposure = []     # Extposure time
-    mb = []             # Exposure time drop down menu
-    cam_back = []        # Camera direction toggle
-    contents_pro_f = []   # Input field projector frames
-    pro_back = []        # Projector direction toggle
-    cycles = []         # Module cycle count
+    mod_on = []             # Module On/Off toggle
+    contents_cam_f = []     # Input field camera frames
+    contents_exposure = []  # Extposure time
+    mb = []                 # Exposure time drop down menu
+    cam_back = []           # Camera direction toggle
+    contents_pro_f = []     # Input field projector frames
+    pro_back = []           # Projector direction toggle
+    cycles = []             # Module cycle count
     exp = 0
+
+    hardware = Charlie()
 
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
+        self.pack()
         self.grid()
         self.layout()
         self.head_widgets()
@@ -129,96 +174,10 @@ class App(tk.Frame):
             self.mb[self.contents_pos], tearoff=0)
         self.mb[self.contents_pos]['menu'] = self.mb[self.contents_pos].menu
 
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='Default', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=0)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='1/5', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=.25)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='1/4', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=0.75)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='0.3', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=0.125)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='0.4', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=0.225)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='0.5', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=0.325)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='0.6', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=0.425)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='0.8', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=0.625)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='1', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=0.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='1.3', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=1.125)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='1.6', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=1.425)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='2', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=1.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='2.5', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=2.325)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='3.2', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=3.025)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='4', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=3.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='5', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=4.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='6', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=5.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='8', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=7.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='10', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=9.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='13', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=12.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='15', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=14.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='20', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=19.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='25', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=24.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='30', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=29.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='35', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=34.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='40', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=39.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='45', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=44.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='50', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=49.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='55', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=55.825)
-        self.mb[self.contents_pos].menu.add_radiobutton(
-            label='60', command=self.update,
-            variable=self.contents_exposure[self.contents_pos], value=59.825)
+        for label, value in self.hardware.exposure_options:
+            self.mb[self.contents_pos].menu.add_radiobutton(
+                label=label, value=value, command=self.update,
+                variable=self.contents_exposure[self.contents_pos])
 
         self.cam_back.append(tk.IntVar())
         self.cam_check = tk.Checkbutton(
@@ -295,7 +254,7 @@ class App(tk.Frame):
         # Determine number of modules in interface
         lst_length = len(self.mod_on)
         for a in range(0, lst_length):
-            self.mb[a]["text"] = self.contents_exposure[a].get()+.175
+            self.mb[a]["text"] = self.contents_exposure[a].get() + .175
 
     def manual(self):
         self.cam_reset['state'] = tk.DISABLED
@@ -538,7 +497,54 @@ class App(tk.Frame):
         self.pro_count["textvariable"] = self.pro_frames
 
 
+class ReelInfo(tk.Frame):
+    def __init__(self, master, reel):
+        tk.Frame.__init__(self, master, borderwidth=2, relief='solid')
+        self.reel = reel
+        self.create_widgets()
+
+    def create_widgets(self):
+        description = tk.Label(
+            master=self, text='Reel: {}'.format(self.reel.description))
+        description.pack(side='top')
+        loaded = tk.Label(
+            master=self, text=time.ctime(self.reel.loaded_at))
+        loaded.pack(side='top')
+
+        count = tk.Frame(master=self)
+        film_frame = tk.Label(master=count, text='frame {} (of {})'.format(
+            self.reel.current_frame, self.reel.total_frames))
+        film_frame_edit = tk.Button(master=count, text='edit')
+        film_frame.pack(side='left')
+        film_frame_edit.pack(side='right')
+        count.pack(side='top')
+
+        load_reel = tk.Button(master=self, text='load new reel')
+        load_reel.pack(side='bottom')
+
+
+class A2(tk.Frame):
+    def __init__(self, master=None):
+        tk.Frame.__init__(self, master)
+
+        self.camera_reel = Reel(1555456657, 'test cam', 1800, 1)
+        self.projector_reel = Reel(1555456657, 'test pro', 2400, 870)
+
+        self.pack()
+        self.create_widgets()
+
+    def create_widgets(self):
+        camera = ReelInfo(self, self.camera_reel)
+        camera.pack(side='left')
+        projector = ReelInfo(self, self.projector_reel)
+        projector.pack(side='right')
+
+    def heya(self):
+        print 'sup', self
+
+
 if __name__ == '__main__':
-    app = App()
+    # app = App()
+    app = A2()
     app.master.title('Charlie Control')
     app.mainloop()
