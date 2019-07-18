@@ -1,366 +1,494 @@
 import Tkinter as tk
 import tkFont
 
+
 class App(tk.Frame):
-    totalcamFrames = 0
-    totalproFrames = 0
-    gridPos = 0
-    contentsPos = -1
-                
-                        # Lists for modular interface
-    modON = []          # Module On/Off toggle
-    contentsCamF = []   # Input field camera frames
-    contentsET = []     # Extposure time 
+    total_cam_frames = 0
+    total_pro_frames = 0
+    grid_pos = 0
+    contents_pos = -1
+
+    # Lists for modular interface
+    mod_on = []          # Module On/Off toggle
+    contents_cam_f = []   # Input field camera frames
+    contents_exposure = []     # Extposure time
     mb = []             # Exposure time drop down menu
-    camBack = []        # Camera direction toggle 
-    contentsProF = []   # Input field projector frames 
-    proBack = []        # Projector direction toggle
+    cam_back = []        # Camera direction toggle
+    contents_pro_f = []   # Input field projector frames
+    pro_back = []        # Projector direction toggle
     cycles = []         # Module cycle count
     exp = 0
 
-    
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.grid()
         self.layout()
-        self.headWidgets()
-        self.inputWidgets()
-        self.footWidgets()
-        
+        self.head_widgets()
+        self.input_widgets()
+        self.foot_widgets()
+
     def layout(self):
-        self.seperatorHead_1 = tk.Frame(bd=1, relief=tk.GROOVE)
-        self.seperatorHead_1.grid(column=0, row=0, ipadx=10, padx=5, pady=5, sticky=tk.W)
+        self.seperator_head_1 = tk.Frame(bd=1, relief=tk.GROOVE)
+        self.seperator_head_1.grid(
+            column=0, row=0, ipadx=10, padx=5, pady=5, sticky=tk.W)
 
-        self.seperatorHead_2 = tk.Frame(bd=1, relief=tk.GROOVE)
-        self.seperatorHead_2.grid(column=1, row=0, ipadx=10, padx=5, pady=5, sticky=tk.E)
-        
-        self.seperatorBody_1 = tk.Frame(bd=3, relief=tk.RIDGE)
-        self.seperatorBody_1.grid(column=0, row=1, padx=5, columnspan=2)
-        
-        self.seperatorFoot_1 = tk.Frame(bd=1, relief=tk.GROOVE)
-        self.seperatorFoot_1.grid(column=0, row=2, padx=5, pady=5, sticky=tk.W)
+        self.seperator_head_2 = tk.Frame(bd=1, relief=tk.GROOVE)
+        self.seperator_head_2.grid(
+            column=1, row=0, ipadx=10, padx=5, pady=5, sticky=tk.E)
 
-        self.seperatorFoot_2 = tk.Frame(bd=1, relief=tk.GROOVE)
-        self.seperatorFoot_2.grid(column=1, row=2, padx=5, pady=5, sticky=tk.E)
+        self.seperator_body_1 = tk.Frame(bd=3, relief=tk.RIDGE)
+        self.seperator_body_1.grid(column=0, row=1, padx=5, columnspan=2)
 
-        self.seperatorFoot_3 = tk.Frame(bd=1, relief=tk.GROOVE)
-        self.seperatorFoot_3.grid(column=0, row=3, padx=5, pady=5, sticky=tk.W)
+        self.seperator_foot_1 = tk.Frame(bd=1, relief=tk.GROOVE)
+        self.seperator_foot_1.grid(
+            column=0, row=2, padx=5, pady=5, sticky=tk.W)
 
-        self.seperatorFoot_4 = tk.Frame(bd=1, relief=tk.GROOVE)
-        self.seperatorFoot_4.grid(column=1, row=3, padx=5, pady=5, sticky=tk.E)
+        self.seperator_foot_2 = tk.Frame(bd=1, relief=tk.GROOVE)
+        self.seperator_foot_2.grid(
+            column=1, row=2, padx=5, pady=5, sticky=tk.E)
 
-                            
-        
-    def headWidgets(self):
-        self.headFont = tkFont.Font(size=20)
+        self.seperator_foot_3 = tk.Frame(bd=1, relief=tk.GROOVE)
+        self.seperator_foot_3.grid(
+            column=0, row=3, padx=5, pady=5, sticky=tk.W)
 
-        self.camTitle = tk.Label(self.seperatorHead_1, text='Current Camera Frame', width=30)
-        self.camTitle.grid(column=0, row=0, columnspan=2)
-        self.proTitle = tk.Label(self.seperatorHead_2, text='Current Projector Frame', width=30)
-        self.proTitle.grid(column=2, row=0, columnspan=2)
-        
-        self.camReset = tk.Button(self.seperatorHead_1, text='reset', state=tk.NORMAL, command=self.camcountReset)
-        self.camReset.grid(column=0, row=1)
+        self.seperator_foot_4 = tk.Frame(bd=1, relief=tk.GROOVE)
+        self.seperator_foot_4.grid(
+            column=1, row=3, padx=5, pady=5, sticky=tk.E)
 
-        self.camFrames = tk.StringVar()
-        self.camFrames.set(self.totalcamFrames)
+    def head_widgets(self):
+        self.head_font = tkFont.Font(size=20)
 
-        self.camCount = tk.Label(self.seperatorHead_1, font=self.headFont)
-        self.camCount.grid(column=1, row=1, padx=5, sticky=tk.E)
-        self.camCount["textvariable"] = self.camFrames
+        self.cam_title = tk.Label(
+            self.seperator_head_1, text='Current Camera Frame', width=30)
+        self.cam_title.grid(column=0, row=0, columnspan=2)
+        self.pro_title = tk.Label(
+            self.seperator_head_2, text='Current Projector Frame', width=30)
+        self.pro_title.grid(column=2, row=0, columnspan=2)
 
-        self.proReset = tk.Button(self.seperatorHead_2, text='reset', state=tk.NORMAL, command=self.procountReset)
-        self.proReset.grid(column=2, row=1)
+        self.cam_reset = tk.Button(
+            self.seperator_head_1, text='reset', state=tk.NORMAL,
+            command=self.cam_countReset)
+        self.cam_reset.grid(column=0, row=1)
 
-        self.proFrames = tk.StringVar()
-        self.proFrames.set(self.totalproFrames)
+        self.cam_frames = tk.StringVar()
+        self.cam_frames.set(self.total_cam_frames)
 
-        self.proCount = tk.Label(self.seperatorHead_2, font=self.headFont)
-        self.proCount.grid(column=3, row=1, padx=5, sticky=tk.E)
-        self.proCount["textvariable"] = self.proFrames
+        self.cam_count = tk.Label(self.seperator_head_1, font=self.head_font)
+        self.cam_count.grid(column=1, row=1, padx=5, sticky=tk.E)
+        self.cam_count["textvariable"] = self.cam_frames
 
-        self.camFlabel = tk.Label(self.seperatorBody_1, text='Camera Frames:')
-        self.camFlabel.grid(column=1, row=0, sticky=tk.W)
+        self.pro_reset = tk.Button(
+            self.seperator_head_2, text='reset', state=tk.NORMAL,
+            command=self.pro_countReset)
+        self.pro_reset.grid(column=2, row=1)
 
-        self.EXlabel = tk.Label(self.seperatorBody_1, text='Exposure Time:')
-        self.EXlabel.grid(column=3, row=0, sticky=tk.W)
+        self.pro_frames = tk.StringVar()
+        self.pro_frames.set(self.total_pro_frames)
 
-        self.proFlabel = tk.Label(self.seperatorBody_1, text='Projector Frames:')
-        self.proFlabel.grid(column=5, row=0, sticky=tk.W)
+        self.pro_count = tk.Label(self.seperator_head_2, font=self.head_font)
+        self.pro_count.grid(column=3, row=1, padx=5, sticky=tk.E)
+        self.pro_count["textvariable"] = self.pro_frames
 
-        self.cycleslabel = tk.Label(self.seperatorBody_1, text='Cycles:')
-        self.cycleslabel.grid(column=7, row=0, sticky=tk.W)
-        
-    def inputWidgets(self):
-        self.gridPos += 1
-        self.contentsPos += 1
-        
-        self.modON.append(tk.IntVar())
-        self.modCheck = tk.Checkbutton(self.seperatorBody_1, text = "ON/OFF", variable=self.modON[self.contentsPos], onvalue =1, offvalue = 0)
-        self.modCheck.grid(column=0, row=self.gridPos, sticky=tk.W)
-        
-        self.contentsCamF.append(tk.IntVar())
-        self.camFrames = tk.Entry(self.seperatorBody_1, justify=tk.RIGHT, textvariable=self.contentsCamF[self.contentsPos])
-        self.camFrames.grid(column=1, row=self.gridPos)
+        self.cam_f_label = tk.Label(
+            self.seperator_body_1, text='Camera Frames:')
+        self.cam_f_label.grid(column=1, row=0, sticky=tk.W)
 
-        
-        self.contentsET.append(tk.DoubleVar())
-        self.mb.append(tk.Menubutton(self.seperatorBody_1, text='Default', relief=tk.RAISED))
-        self.mb[self.contentsPos].grid(column=3, row=self.gridPos, padx=5, pady=3, sticky=tk.W)
-        self.mb[self.contentsPos].menu = tk.Menu(self.mb[self.contentsPos], tearoff=0)
-        self.mb[self.contentsPos]['menu'] = self.mb[self.contentsPos].menu
+        self.ex_label = tk.Label(self.seperator_body_1, text='Exposure Time:')
+        self.ex_label.grid(column=3, row=0, sticky=tk.W)
 
-        
-        self.mb[self.contentsPos].menu.add_radiobutton(label='Default', command=self.update, variable=self.contentsET[self.contentsPos], value=0)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='1/5', command=self.update, variable=self.contentsET[self.contentsPos], value=.25)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='1/4', command=self.update, variable=self.contentsET[self.contentsPos], value=0.75)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='0.3', command=self.update, variable=self.contentsET[self.contentsPos], value=0.125)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='0.4', command=self.update, variable=self.contentsET[self.contentsPos], value=0.225)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='0.5', command=self.update, variable=self.contentsET[self.contentsPos], value=0.325)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='0.6', command=self.update, variable=self.contentsET[self.contentsPos], value=0.425)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='0.8', command=self.update, variable=self.contentsET[self.contentsPos], value=0.625)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='1', command=self.update, variable=self.contentsET[self.contentsPos], value=0.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='1.3', command=self.update, variable=self.contentsET[self.contentsPos], value=1.125)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='1.6', command=self.update, variable=self.contentsET[self.contentsPos], value=1.425)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='2', command=self.update, variable=self.contentsET[self.contentsPos], value=1.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='2.5', command=self.update, variable=self.contentsET[self.contentsPos], value=2.325)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='3.2', command=self.update, variable=self.contentsET[self.contentsPos], value=3.025)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='4', command=self.update, variable=self.contentsET[self.contentsPos], value=3.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='5', command=self.update, variable=self.contentsET[self.contentsPos], value=4.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='6', command=self.update, variable=self.contentsET[self.contentsPos], value=5.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='8', command=self.update, variable=self.contentsET[self.contentsPos], value=7.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='10', command=self.update, variable=self.contentsET[self.contentsPos], value=9.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='13', command=self.update, variable=self.contentsET[self.contentsPos], value=12.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='15', command=self.update, variable=self.contentsET[self.contentsPos], value=14.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='20', command=self.update, variable=self.contentsET[self.contentsPos], value=19.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='25', command=self.update, variable=self.contentsET[self.contentsPos], value=24.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='30', command=self.update, variable=self.contentsET[self.contentsPos], value=29.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='35', command=self.update, variable=self.contentsET[self.contentsPos], value=34.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='40', command=self.update, variable=self.contentsET[self.contentsPos], value=39.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='45', command=self.update, variable=self.contentsET[self.contentsPos], value=44.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='50', command=self.update, variable=self.contentsET[self.contentsPos], value=49.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='55', command=self.update, variable=self.contentsET[self.contentsPos], value=55.825)
-        self.mb[self.contentsPos].menu.add_radiobutton(label='60', command=self.update, variable=self.contentsET[self.contentsPos], value=59.825)
-        
-        self.camBack.append(tk.IntVar())
-        self.camCheck = tk.Checkbutton(self.seperatorBody_1, text = "Reverse", variable=self.camBack[self.contentsPos], onvalue =1, offvalue = 0)
-        self.camCheck.grid(column=4, row=self.gridPos, sticky=tk.W)
+        self.pro_f_label = tk.Label(
+            self.seperator_body_1, text='Projector Frames:')
+        self.pro_f_label.grid(column=5, row=0, sticky=tk.W)
 
-        self.contentsProF.append(tk.IntVar())
-        self.proFrames = tk.Entry(self.seperatorBody_1, justify=tk.RIGHT, textvariable=self.contentsProF[self.contentsPos])
-        self.proFrames.grid(column=5, row=self.gridPos)
+        self.cycles_label = tk.Label(self.seperator_body_1, text='Cycles:')
+        self.cycles_label.grid(column=7, row=0, sticky=tk.W)
 
-        self.proBack.append(tk.IntVar())
-        self.proCheck = tk.Checkbutton(self.seperatorBody_1, text = "Reverse", variable=self.proBack[self.contentsPos], onvalue =1, offvalue = 0)
-        self.proCheck.grid(column=6, row=self.gridPos, sticky=tk.W)
+    def input_widgets(self):
+        self.grid_pos += 1
+        self.contents_pos += 1
+
+        self.mod_on.append(tk.IntVar())
+        self.mod_check = tk.Checkbutton(
+            self.seperator_body_1, text="ON/OFF",
+            variable=self.mod_on[self.contents_pos], onvalue=1, offvalue=0)
+        self.mod_check.grid(column=0, row=self.grid_pos, sticky=tk.W)
+
+        self.contents_cam_f.append(tk.IntVar())
+        self.cam_frames = tk.Entry(
+            self.seperator_body_1, justify=tk.RIGHT,
+            textvariable=self.contents_cam_f[self.contents_pos])
+        self.cam_frames.grid(column=1, row=self.grid_pos)
+
+        self.contents_exposure.append(tk.DoubleVar())
+        self.mb.append(tk.Menubutton(
+            self.seperator_body_1, text='Default',
+            relief=tk.RAISED))
+        self.mb[self.contents_pos].grid(
+            column=3, row=self.grid_pos, padx=5, pady=3, sticky=tk.W)
+        self.mb[self.contents_pos].menu = tk.Menu(
+            self.mb[self.contents_pos], tearoff=0)
+        self.mb[self.contents_pos]['menu'] = self.mb[self.contents_pos].menu
+
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='Default', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=0)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='1/5', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=.25)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='1/4', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=0.75)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='0.3', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=0.125)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='0.4', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=0.225)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='0.5', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=0.325)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='0.6', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=0.425)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='0.8', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=0.625)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='1', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=0.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='1.3', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=1.125)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='1.6', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=1.425)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='2', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=1.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='2.5', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=2.325)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='3.2', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=3.025)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='4', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=3.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='5', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=4.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='6', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=5.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='8', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=7.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='10', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=9.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='13', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=12.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='15', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=14.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='20', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=19.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='25', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=24.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='30', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=29.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='35', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=34.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='40', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=39.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='45', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=44.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='50', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=49.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='55', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=55.825)
+        self.mb[self.contents_pos].menu.add_radiobutton(
+            label='60', command=self.update,
+            variable=self.contents_exposure[self.contents_pos], value=59.825)
+
+        self.cam_back.append(tk.IntVar())
+        self.cam_check = tk.Checkbutton(
+            self.seperator_body_1, text="Reverse",
+            variable=self.cam_back[self.contents_pos], onvalue=1,
+            offvalue=0)
+        self.cam_check.grid(column=4, row=self.grid_pos, sticky=tk.W)
+
+        self.contents_pro_f.append(tk.IntVar())
+        self.pro_frames = tk.Entry(
+            self.seperator_body_1, justify=tk.RIGHT,
+            textvariable=self.contents_pro_f[self.contents_pos])
+        self.pro_frames.grid(column=5, row=self.grid_pos)
+
+        self.pro_back.append(tk.IntVar())
+        self.pro_check = tk.Checkbutton(
+            self.seperator_body_1, text="Reverse",
+            variable=self.pro_back[self.contents_pos], onvalue=1,
+            offvalue=0)
+        self.pro_check.grid(column=6, row=self.grid_pos, sticky=tk.W)
 
         self.cycles.append(tk.IntVar())
-        self.cycleBlock = tk.Entry(self.seperatorBody_1, justify=tk.RIGHT, textvariable=self.cycles[self.contentsPos])
-        self.cycleBlock.grid(column=7, row=self.gridPos)    
-    
-    def footWidgets(self):  
-        self.addButton = tk.Button(self.seperatorFoot_1, text='+',padx=1,pady=1, height=1, width=2, command=self.inputWidgets)
-        self.addButton.grid(column=0, row=0, sticky=tk.W)
+        self.cycle_block = tk.Entry(
+            self.seperator_body_1, justify=tk.RIGHT,
+            textvariable=self.cycles[self.contents_pos])
+        self.cycle_block.grid(column=7, row=self.grid_pos)
 
-        self.runButton = tk.Button(self.seperatorFoot_3, text='RUN', fg='red', command=self.runProgram)
-        self.runButton.grid(column=0, row=0, sticky=tk.W)
+    def foot_widgets(self):
+        self.add_button = tk.Button(
+            self.seperator_foot_1, text='+', padx=1, pady=1, height=1, width=2,
+            command=self.input_widgets)
+        self.add_button.grid(column=0, row=0, sticky=tk.W)
 
-        self.testButton = tk.Button(self.seperatorFoot_3, text='test', fg='green', command=self.testProgram)
-        self.testButton.grid(column=1, row=0, sticky=tk.W)
+        self.run_button = tk.Button(
+            self.seperator_foot_3, text='RUN', fg='red',
+            command=self.run_program)
+        self.run_button.grid(column=0, row=0, sticky=tk.W)
 
-        self.totalcycleslabel = tk.Label(self.seperatorFoot_2, text='Total Cycles:')
-        self.totalcycleslabel.grid(column=0, row=0)
-        self.totalcycles = tk.IntVar()
-        self.totalcycleBlock = tk.Entry(self.seperatorFoot_2, justify=tk.RIGHT, textvariable=self.totalcycles)
-        self.totalcycleBlock.grid(column=1, row=0)
+        self.test_button = tk.Button(
+            self.seperator_foot_3, text='test', fg='green',
+            command=self.testProgram)
+        self.test_button.grid(column=1, row=0, sticky=tk.W)
 
-        self.man = tk.Button(self.seperatorFoot_4, text='Manual Mode', command=self.manual)
+        self.total_cycles_label = tk.Label(
+            self.seperator_foot_2, text='Total Cycles:')
+        self.total_cycles_label.grid(column=0, row=0)
+        self.total_cycles = tk.IntVar()
+        self.total_cycle_block = tk.Entry(
+            self.seperator_foot_2, justify=tk.RIGHT,
+            textvariable=self.total_cycles)
+        self.total_cycle_block.grid(column=1, row=0)
+
+        self.man = tk.Button(
+            self.seperator_foot_4, text='Manual Mode', command=self.manual)
         self.man.grid(column=0, row=0)
-        self.camFW = tk.Button(self.seperatorFoot_4, text='Camera FW', state=tk.NORMAL, command=self.camForward)
-        self.camFW.grid(column=1, row=0)
-        self.camBW = tk.Button(self.seperatorFoot_4, text='Camera BW', state=tk.NORMAL, command=self.camBackward)
-        self.camBW.grid(column=2, row=0)
-        self.proFW = tk.Button(self.seperatorFoot_4, text='Projector FW', state=tk.NORMAL, command=self.proForward)
-        self.proFW.grid(column=3, row=0)
-        self.proBW = tk.Button(self.seperatorFoot_4, text='Projector BW',state=tk.NORMAL, command=self.proBackward)
-        self.proBW.grid(column=4, row=0, sticky=tk.W) 
+        self.cam_fw = tk.Button(
+            self.seperator_foot_4, text='Camera FW', state=tk.NORMAL,
+            command=self.cam_forward)
+        self.cam_fw.grid(column=1, row=0)
+        self.cam_bw = tk.Button(
+            self.seperator_foot_4, text='Camera BW', state=tk.NORMAL,
+            command=self.cam_backward)
+        self.cam_bw.grid(column=2, row=0)
+        self.pro_fw = tk.Button(
+            self.seperator_foot_4, text='Projector FW', state=tk.NORMAL,
+            command=self.pro_forward)
+        self.pro_fw.grid(column=3, row=0)
+        self.pro_bw = tk.Button(
+            self.seperator_foot_4, text='Projector BW', state=tk.NORMAL,
+            command=self.pro_backward)
+        self.pro_bw.grid(column=4, row=0, sticky=tk.W)
 
     def update(self):
-        lstLength = len(self.modON) #Determine number of modules in interface
-        for a in range (0, lstLength):
-            self.mb[a]["text"] = self.contentsET[a].get()+.175
-    
+        # Determine number of modules in interface
+        lst_length = len(self.mod_on)
+        for a in range(0, lst_length):
+            self.mb[a]["text"] = self.contents_exposure[a].get()+.175
+
     def manual(self):
-        self.camReset ['state'] = tk.DISABLED
-        self.proReset ['state'] = tk.DISABLED
-        self.camFW ['state'] = tk.DISABLED
-        self.camBW ['state'] = tk.DISABLED
-        self.proFW ['state'] = tk.DISABLED
-        self.proBW ['state'] = tk.DISABLED
-        input_camButton = GPIO.input(15)
-        input_proButton = GPIO.input(19)
-        input_camFB = GPIO.input(23)
-        input_proFB = GPIO.input(26)
+        self.cam_reset['state'] = tk.DISABLED
+        self.pro_reset['state'] = tk.DISABLED
+        self.cam_fw['state'] = tk.DISABLED
+        self.cam_bw['state'] = tk.DISABLED
+        self.pro_fw['state'] = tk.DISABLED
+        self.pro_bw['state'] = tk.DISABLED
+        input_cam_button = GPIO.input(15)
+        input_pro_button = GPIO.input(19)
+        input_cam_fb = GPIO.input(23)
+        input_pro_fb = GPIO.input(26)
         time.sleep(.5)
-        while input_camButton or input_proButton == True:
+        while input_cam_button or input_pro_button is True:
             time.sleep(.5)
-            input_camButton = GPIO.input(15)
-            input_proButton = GPIO.input(19)
-            input_camFB = GPIO.input(23)
-            input_proFB = GPIO.input(26)
-            if input_camButton == False:
-                if input_camFB == False:
-                    self.camBackward()
+            input_cam_button = GPIO.input(15)
+            input_pro_button = GPIO.input(19)
+            input_cam_fb = GPIO.input(23)
+            input_pro_fb = GPIO.input(26)
+            if input_cam_button is False:
+                if input_cam_fb is False:
+                    self.cam_backward()
                 else:
-                    self.camForward()
-            if input_proButton == False:
-                if input_proFB == False:
-                    self.proBackward()
+                    self.cam_forward()
+            if input_pro_button is False:
+                if input_pro_fb is False:
+                    self.pro_backward()
                 else:
-                    self.proForward()
-            if GPIO.input(21)== False:
-                self.footWidgets()
-                self.headWidgets()
+                    self.pro_forward()
+            if GPIO.input(21) is False:
+                self.foot_widgets()
+                self.head_widgets()
                 break
 
-        
-    def runProgram(self):        
-        lstLength = len(self.modON) #Determine number of modules in interface
-        for a in range(0, self.totalcycles.get()):
-            if GPIO.input(21) == False:
+    def run_program(self):
+        # Determine number of modules in interface
+        lst_length = len(self.mod_on)
+        for a in range(0, self.total_cycles.get()):
+            if GPIO.input(21) is False:
                 break
             index = 0
-            for b in range(0, lstLength):
+            for b in range(0, lst_length):
                 for c in range(0, self.cycles[index].get()):
-                    if GPIO.input(21)== False:
+                    if GPIO.input(21) is False:
                         break
-                    if self.modON[index].get() == 1:
-                        for d in range(0, self.contentsCamF[index].get()):
-                            self.exp = self.contentsET[index].get()
-                            if self.camBack[index].get() == 0:
-                                JK_Application.camForward(self)
+                    if self.mod_on[index].get() == 1:
+                        for d in range(0, self.contents_cam_f[index].get()):
+                            self.exp = self.contents_exposure[index].get()
+                            if self.cam_back[index].get() == 0:
+                                self.cam_forward()
                             else:
-                                JK_Application.camBackward(self)
+                                self.cam_backward()
                             time.sleep(.5)
-                        for e in range(0, self.contentsProF[index].get()):
-                            if self.proBack[index].get() == 0:
-                                JK_Application.proForward(self)
+                        for e in range(0, self.contents_pro_f[index].get()):
+                            if self.pro_back[index].get() == 0:
+                                self.pro_forward()
                             else:
-                                JK_Application.proBackward(self)
+                                self.pro_backward()
                             time.sleep(.5)
-                index+=1
+                index += 1
 
-    def testProgram(self):   
+    def testProgram(self):
 
         grid1 = 10
-        self.window_1=tk.Toplevel()
+        self.window_1 = tk.Toplevel()
 
-        self.canv = tk.Canvas(self.window_1, width=500, height=800, scrollregion=(0, 0, 0, 0))
+        self.canv = tk.Canvas(
+            self.window_1, width=500, height=800, scrollregion=(0, 0, 0, 0))
         self.canv.grid()
-        self.scrollY = tk.Scrollbar(self.window_1, orient=tk.VERTICAL, command=self.canv.yview)
-        self.scrollY.grid(row=0, column=1, sticky=tk.N+tk.S)
-        self.canv['yscrollcommand'] = self.scrollY.set
+        self.scroll_y = tk.Scrollbar(
+            self.window_1, orient=tk.VERTICAL, command=self.canv.yview)
+        self.scroll_y.grid(row=0, column=1, sticky=tk.N+tk.S)
+        self.canv['yscrollcommand'] = self.scroll_y.set
 
-        lstLength = len(self.modON) #Determine number of modules in interface
+        # Determine number of modules in interface
+        lst_length = len(self.mod_on)
 
         self.lab1 = tk.Label(self.window_1, text='# of Modules: ')
-        self.scrollWin = self.canv.create_window(110, grid1, window=self.lab1)
-        self.lab2 = tk.Label(self.window_1, text=lstLength)
-        self.scrollWin = self.canv.create_window(400, grid1, window=self.lab2)
+        self.scroll_win = self.canv.create_window(110, grid1, window=self.lab1)
+        self.lab2 = tk.Label(self.window_1, text=lst_length)
+        self.scroll_win = self.canv.create_window(400, grid1, window=self.lab2)
 
-        
-        for a in range(0, self.totalcycles.get()):
-           
-            index=0
-            grid1+=30
-            
+        for a in range(0, self.total_cycles.get()):
+            index = 0
+            grid1 += 30
+
             self.lab3 = tk.Label(self.window_1, text='Main Loop: ')
-            self.scrollWin = self.canv.create_window(110, grid1, window=self.lab3)
+            self.scroll_win = self.canv.create_window(
+                110, grid1, window=self.lab3)
             self.lab4 = tk.Label(self.window_1, text=a+1)
-            self.scrollWin = self.canv.create_window(400, grid1, window=self.lab4)
+            self.scroll_win = self.canv.create_window(
+                400, grid1, window=self.lab4)
 
-            for b in range(0, lstLength):
-                grid1+=20
-                
+            for b in range(0, lst_length):
+                grid1 += 20
+
                 self.lab5 = tk.Label(self.window_1, text='Module: ')
-                self.scrollWin = self.canv.create_window(110, grid1, window=self.lab5)
+                self.scroll_win = self.canv.create_window(
+                    110, grid1, window=self.lab5)
                 self.lab6 = tk.Label(self.window_1, text=index+1)
-                self.scrollWin = self.canv.create_window(400, grid1, window=self.lab6)
+                self.scroll_win = self.canv.create_window(
+                    400, grid1, window=self.lab6)
 
                 for c in range(0, self.cycles[index].get()):
-                    if self.modON[index].get() == 1:
-                        for d in range(0, self.contentsCamF[index].get()):
+                    if self.mod_on[index].get() == 1:
+                        for d in range(0, self.contents_cam_f[index].get()):
+                            grid1 += 20
 
-                            grid1+=20
-
-                            if self.camBack[index].get() == 0:
-                                
-                                self.lab7 = tk.Label(self.window_1, text='Camera Forward, Exposure Time: ')
-                                self.scrollWin = self.canv.create_window(110, grid1, window=self.lab7)
-                                self.lab8 = tk.Label(self.window_1, text=self.contentsET[index].get()+.175)
-                                self.scrollWin = self.canv.create_window(400, grid1, window=self.lab8)
-
-                            else:
-
-                                self.lab7 = tk.Label(self.window_1, text='Camera Backward, Exposure Time: ')
-                                self.scrollWin = self.canv.create_window(110, grid1, window=self.lab7)
-                                self.lab8 = tk.Label(self.window_1, text=self.contentsET[index].get()+.175)
-                                self.scrollWin = self.canv.create_window(400, grid1, window=self.lab8)
-
-                        for e in range(0, self.contentsProF[index].get()):
-
-                            grid1+=20
-
-                            if self.proBack[index].get() == 0:
-
-                                self.lab9 = tk.Label(self.window_1, text='Projector Forward')
-                                self.scrollWin = self.canv.create_window(110, grid1, window=self.lab9)
+                            if self.cam_back[index].get() == 0:
+                                self.lab7 = tk.Label(
+                                    self.window_1,
+                                    text='Camera Forward, Exposure Time: ')
+                                self.scroll_win = self.canv.create_window(
+                                    110, grid1, window=self.lab7)
+                                self.lab8 = tk.Label(
+                                    self.window_1,
+                                    text=self.contents_exposure[index].get() +
+                                    .175)
+                                self.scroll_win = self.canv.create_window(
+                                    400, grid1, window=self.lab8)
 
                             else:
-                                self.lab10 = tk.Label(self.window_1, text='Projector Backward')
-                                self.scrollWin = self.canv.create_window(110, grid1, window=self.lab10)
+                                self.lab7 = tk.Label(
+                                    self.window_1,
+                                    text='Camera Backward, Exposure Time: ')
+                                self.scroll_win = self.canv.create_window(
+                                    110, grid1, window=self.lab7)
+                                self.lab8 = tk.Label(
+                                    self.window_1,
+                                    text=self.contents_exposure[index].get() +
+                                    .175)
+                                self.scroll_win = self.canv.create_window(
+                                    400, grid1, window=self.lab8)
+
+                        for e in range(0, self.contents_pro_f[index].get()):
+                            grid1 += 20
+
+                            if self.pro_back[index].get() == 0:
+
+                                self.lab9 = tk.Label(
+                                    self.window_1, text='Projector Forward')
+                                self.scroll_win = self.canv.create_window(
+                                    110, grid1, window=self.lab9)
+
+                            else:
+                                self.lab10 = tk.Label(
+                                    self.window_1, text='Projector Backward')
+                                self.scroll_win = self.canv.create_window(
+                                    110, grid1, window=self.lab10)
                     else:
+                        grid1 += 20
 
-                        grid1+=20
+                        self.lab7 = tk.Label(
+                            self.window_1, text='Module Skipped')
+                        self.scroll_win = self.canv.create_window(
+                            110, grid1, window=self.lab7)
 
-                        self.lab7 = tk.Label(self.window_1, text='Module Skipped')
-                        self.scrollWin = self.canv.create_window(110, grid1, window=self.lab7)
-                index+=1 
+                index += 1
                 self.canv['scrollregion'] = (0, 0, 0, grid1)
-                
-    def camForward(self):
-        self.totalcamFrames+=1
-        self.camFrames = tk.StringVar()
-        self.camFrames.set(self.totalcamFrames)
-        self.camCount["textvariable"] = self.camFrames
+
+    def cam_forward(self):
+        self.total_cam_frames += 1
+        self.cam_frames = tk.StringVar()
+        self.cam_frames.set(self.total_cam_frames)
+        self.cam_count["textvariable"] = self.cam_frames
         GPIO.output(16, True)
         time.sleep(.025)
         input_camPos = GPIO.input(11)
-        while input_camPos == True:
+        while input_camPos is True:
             input_camPos = GPIO.input(11)
             input_camET = GPIO.input(13)
-            if input_camET == False:
+            if input_camET is False:
                 GPIO.output(16, False)
                 time.sleep(self.exp)
                 GPIO.output(16, True)
                 time.sleep(.025)
             else:
-                GPIO.output(16, True)   
+                GPIO.output(16, True)
         GPIO.output(16, False)
 
-    def camBackward(self):
-        self.totalcamFrames-=1
-        self.camFrames = tk.StringVar()
-        self.camFrames.set(self.totalcamFrames)
-        self.camCount["textvariable"] = self.camFrames
- 
+    def cam_backward(self):
+        self.total_cam_frames -= 1
+        self.cam_frames = tk.StringVar()
+        self.cam_frames.set(self.total_cam_frames)
+        self.cam_count["textvariable"] = self.cam_frames
+
         GPIO.output(12, True)
         time.sleep(.025)
         input_camPos = GPIO.input(11)
-        while input_camPos == True:
+        while input_camPos is True:
             input_camPos = GPIO.input(11)
             input_camET = GPIO.input(13)
-            if input_camET == False:
+            if input_camET is False:
                 GPIO.output(12, False)
                 time.sleep(self.exp)
                 GPIO.output(12, True)
@@ -368,46 +496,46 @@ class App(tk.Frame):
             else:
                 GPIO.output(12, True)
         GPIO.output(12, False)
-        
-    def proForward(self):
-        self.totalproFrames+=1
-        self.proFrames = tk.StringVar()
-        self.proFrames.set(self.totalproFrames)
-        self.proCount["textvariable"] = self.proFrames
- 
+
+    def pro_forward(self):
+        self.total_pro_frames += 1
+        self.pro_frames = tk.StringVar()
+        self.pro_frames.set(self.total_pro_frames)
+        self.pro_count["textvariable"] = self.pro_frames
+
         GPIO.output(22, True)
         time.sleep(.025)
         input_camPos = GPIO.input(7)
-        while input_camPos == True:
+        while input_camPos is True:
             input_camPos = GPIO.input(7)
             GPIO.output(22, True)
         GPIO.output(22, False)
 
-    def proBackward(self):
-        self.totalproFrames-=1
-        self.proFrames = tk.StringVar()
-        self.proFrames.set(self.totalproFrames)
-        self.proCount["textvariable"] = self.proFrames
- 
+    def pro_backward(self):
+        self.total_pro_frames -= 1
+        self.pro_frames = tk.StringVar()
+        self.pro_frames.set(self.total_pro_frames)
+        self.pro_count["textvariable"] = self.pro_frames
+
         GPIO.output(18, True)
         time.sleep(.025)
         input_camPos = GPIO.input(7)
-        while input_camPos == True:
+        while input_camPos is True:
             input_camPos = GPIO.input(7)
             GPIO.output(18, True)
         GPIO.output(18, False)
 
-    def camcountReset(self):
-        self.totalcamFrames=0
-        self.camFrames = tk.StringVar()
-        self.camFrames.set(self.totalcamFrames)
-        self.camCount["textvariable"] = self.camFrames
-  
-    def procountReset(self):
-        self.totalproFrames=0
-        self.proFrames = tk.StringVar()
-        self.proFrames.set(self.totalproFrames)
-        self.proCount["textvariable"] = self.proFrames
+    def cam_countReset(self):
+        self.total_cam_frames = 0
+        self.cam_frames = tk.StringVar()
+        self.cam_frames.set(self.total_cam_frames)
+        self.cam_count["textvariable"] = self.cam_frames
+
+    def pro_countReset(self):
+        self.total_pro_frames = 0
+        self.pro_frames = tk.StringVar()
+        self.pro_frames.set(self.total_pro_frames)
+        self.pro_count["textvariable"] = self.pro_frames
 
 
 if __name__ == '__main__':
