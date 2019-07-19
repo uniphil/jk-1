@@ -1,5 +1,6 @@
 import time
 import Tkinter as tk
+import ttk
 import tkFont
 
 from reel import Reel
@@ -498,32 +499,47 @@ class App(tk.Frame):
 
 
 class LoadReelPopup(tk.Toplevel):
-    def __init__(self, device, reel, close):
+    def __init__(self, device, close):
         tk.Toplevel.__init__(self)
+        self.bind('<Destroy>', self.handle_destroy)
+        self.bind('<Escape>', lambda _: self.cancel())
+
+        frame = ttk.Frame(self)
+        frame.pack(fill='both')
+
         self.title('Load {} reel...'.format(device))
         self.close = close
 
-        description_label = tk.Label(self, text='Description')
-        description_label.pack()
-        self.description = tk.Entry(self)
-        self.description.pack()
+        title_label = ttk.Label(frame, text='New {} reel'.format(device))
+        title_label.grid(column=1, row=0)
 
-        total_frames_label = tk.Label(self, text='Total frames')
-        total_frames_label.pack()
-        self.total_frames = tk.Entry(self)
-        self.total_frames.pack()
+        description_label = ttk.Label(frame, text='Description')
+        description_label.grid(column=0, row=1, sticky=tk.E)
+        self.description = ttk.Entry(frame)
+        self.description.grid(column=1, row=1)
+        self.description.focus()
 
-        current_frame_label = tk.Label(self, text='Current frame')
-        current_frame_label.pack()
-        self.current_frame = tk.Entry(self)
-        self.current_frame.pack()
+        total_frames_label = ttk.Label(frame, text='Total frames')
+        total_frames_label.grid(column=0, row=2, sticky=tk.E)
+        self.total_frames = ttk.Entry(frame)
+        self.total_frames.grid(column=1, row=2)
 
-        buttons = tk.Frame(self)
-        buttons.pack(side='bottom')
-        cancel = tk.Button(buttons, text='Cancel', command=self.cancel)
+        current_frame_label = ttk.Label(frame, text='Initial frame')
+        current_frame_label.grid(column=0, row=3, sticky=tk.E)
+
+        self.current_frame = ttk.Entry(frame)
+        self.current_frame.grid(column=1, row=3)
+
+        buttons = ttk.Frame(frame)
+        buttons.grid(column=0, columnspan=2, row=4)
+        cancel = ttk.Button(buttons, text='Cancel', command=self.cancel)
         cancel.pack(side='left')
-        save = tk.Button(buttons, text='Save', command=self.save)
+        save = ttk.Button(buttons, text='Save', command=self.save)
         save.pack(side='right')
+
+    def handle_destroy(self, event):
+        if event.widget is self:
+            self.cancel()
 
     def cancel(self):
         self.close(None)
@@ -536,81 +552,122 @@ class LoadReelPopup(tk.Toplevel):
         new_reel = Reel(now, description, total_frames, current_frame)
         self.close(new_reel)
 
+    def validate_number(self):
+        print('ok', self)
+        return 'asdf'
 
-class ReelInfo(tk.LabelFrame):
+
+class ReelInfo(ttk.LabelFrame):
     def __init__(self, master, device, reel, update_reel):
-        tk.LabelFrame.__init__(self, master, relief='solid', borderwidth=2)
+        ttk.LabelFrame.__init__(self, master, relief='solid', borderwidth=2)
         self.device = device
-        self.reel = reel
         self.update_reel = update_reel
+        self.reel_popup = None
         self.create_widgets()
+        self.update(reel)
 
     def create_widgets(self):
-        top = tk.Frame()
+        top = ttk.Frame()
         top.pack(fill='x')
-        label = tk.Label(top, text='{} reel: {}'.format(
-            self.device, self.reel.description))
-        label.pack(side='left')
-        load_reel = tk.Button(top, text='load', command=self.load_reel)
-        load_reel.pack(side='right')
+        self.label = ttk.Label(top)
+        self.label.pack(side='left')
+        self.load_button = ttk.Button(
+            top, text='load new', command=self.load_reel)
+        self.load_button.pack(side='right')
         self.config(labelwidget=top)
 
-        count = tk.Frame(self)
-        film_frame = tk.Label(count, text='frame {} (of {})'.format(
-            self.reel.current_frame, self.reel.total_frames))
-        film_frame_edit = tk.Button(
-            count, text='edit', command=self.edit_count)
-        film_frame.pack(side='left')
+        count = ttk.Frame(self)
+        self.film_frame = ttk.Label(count)
+        self.film_frame.pack(side='left')
+        film_frame_edit = ttk.Button(
+            count, text='override', command=self.edit_count)
         film_frame_edit.pack(side='right')
         count.pack(side='top')
 
-        loaded = tk.Label(
-            self, text=time.ctime(self.reel.loaded_at))
-        loaded.pack(side='top')
+        self.loaded = ttk.Label(self)
+        self.loaded.pack(side='top')
 
     def edit_count(self):
-        fr = tk.Frame(None)
-        b = tk.Button(fr)
+        fr = ttk.Frame(None)
+        b = ttk.Button(fr)
         b.pack(side='bottom')
         fr.pack()
 
     def load_reel(self):
-        self.pop = LoadReelPopup(self.device, self.reel, self.close_load_popup)
+        if self.reel_popup is not None:
+            return
+        self.reel_popup = LoadReelPopup(self.device, self.close_load_popup)
+        self.reel_popup.transient(self)
+        self.load_button.config(state=tk.DISABLED)
 
     def close_load_popup(self, reel):
         if reel is not None:
             self.update_reel(reel)
-        self.pop.destroy()
+        self.reel_popup.destroy()
+        self.reel_popup = None
+        self.load_button.config(state=tk.NORMAL)
+
+    def update(self, reel):
+        self.label.config(text='reel: {}'.format(reel.description))
+        self.film_frame.config(text='frame: {} (of {})'.format(
+            reel.current_frame, reel.total_frames))
+        self.loaded.config(text='loaded: {}'.format(
+            time.ctime(reel.loaded_at)))
 
 
-class A2(tk.Frame):
+class A2(ttk.Frame):
+
     def __init__(self, master=None):
-        tk.Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         self.camera_reel = Reel(1555456657, 'test cam', 1800, 1)
+        self.camera_enable_manual = tk.BooleanVar()
+        self.camera_enable_manual.set(False)
         self.projector_reel = Reel(1555456657, 'test pro', 2400, 870)
         self.create_widgets()
         self.pack(fill='both')
 
     def create_widgets(self):
+        self.camera_frame = ttk.Frame(self)
+        camera_label = ttk.Label(self.camera_frame, text='Camera')
+        camera_label.pack()
         self.camera_reel_widget = ReelInfo(
-            self, 'Camera', self.camera_reel, self.update_camera_reel)
-        self.camera_reel_widget.pack(side='left')
+            self.camera_frame, 'camera', self.camera_reel,
+            self.replace_camera_reel)
+        self.camera_reel_widget.pack()
+
+        camera_manual = ttk.Frame(self.camera_frame)
+        enable_manual = ttk.Checkbutton(
+            camera_manual, variable=self.camera_enable_manual,
+            text='Enable manual control')
+        enable_manual.pack(side='left')
+        self.camera_enable_manual.trace('w', self.blah)
+        # enable_manual.bind('<Change>', self.blah)
+        camera_manual.pack()
+
+        self.camera_frame.pack(side='left')
+
+        self.projector_frame = ttk.Frame(self)
+        projector_label = ttk.Label(self.projector_frame, text='Projector')
+        projector_label.pack()
         self.projector_reel_widget = ReelInfo(
-            self, 'Projector', self.projector_reel, self.update_projector_reel)
-        self.projector_reel_widget.pack(side='right')
+            self.projector_frame, 'crojector', self.projector_reel,
+            self.replace_projector_reel)
+        self.projector_reel_widget.pack()
+        self.projector_frame.pack(side='right')
 
-    def update_widgets(self):
-        self.camera_reel_widget.destroy()
-        self.projector_reel_widget.destroy()
-        self.create_widgets()
+        self.program_frame = ttk.Frame(self)
+        self.program_frame.pack(side='bottom')
 
-    def update_camera_reel(self, reel):
+    def blah(self, x, y, z):
+        print 'blah', x, y, z
+
+    def replace_camera_reel(self, reel):
         self.camera_reel = reel
-        self.update_widgets()
+        self.camera_reel_widget.update(reel)
 
-    def update_projector_reel(self, reel):
+    def replace_projector_reel(self, reel):
         self.projector_reel = reel
-        self.update_widgets()
+        self.projector_reel_widget.update(reel)
 
     def heya(self):
         print 'sup', self
