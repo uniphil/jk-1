@@ -8,6 +8,7 @@ class App(ttk.Frame):
 
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
+        self.master.title('Charlie control')
         self.camera_reel = Reel(1555456657, 'test cam', 1800, 1)
         self.camera_current_frame = tk.IntVar()
         self.camera_current_frame.set(self.camera_reel.current_frame)
@@ -20,7 +21,7 @@ class App(ttk.Frame):
         self.projector_current_frame.set(self.projector_reel.current_frame)
         self.projector_current_frame.trace('w', self.update_projector_frame)
         self.create_widgets()
-        self.pack(fill='both')
+        self.grid()
 
     def create_widgets(self):
         camera_frame = ttk.Frame(self)

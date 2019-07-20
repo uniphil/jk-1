@@ -499,5 +499,5 @@ class App(tk.Frame):
 if __name__ == '__main__':
     # app = App()
     app = ui.App()
-    app.master.title('Charlie Control')
+    app.master.lift()  # dunno why this helps with first render
     app.mainloop()
