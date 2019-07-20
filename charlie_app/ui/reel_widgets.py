@@ -122,31 +122,27 @@ class ReelInfo(ttk.Frame):
         self.update(reel)
 
     def create_widgets(self):
-        reel_label = ttk.Label(self, text='Reel:')
-        reel_label.grid(column=0, row=0)
+        info_frame = ttk.Frame(self)
+        button_frame = ttk.Frame(self)
 
-        reel_frame = ttk.Frame(self)
-        reel_frame.grid(column=1, row=0, sticky=tk.W)
-        self.description = ttk.Label(reel_frame)
-        self.description.pack(anchor=tk.W)
+        self.description = ttk.Label(info_frame)
+        self.loaded_label = ttk.Label(info_frame)
+        self.film_frame = ttk.Label(info_frame)
 
-        self.loaded = ttk.Label(reel_frame)
-        self.loaded.pack(anchor=tk.W)
-
-        self.replace_button = ttk.Button(
-            reel_frame, text='replace', command=self.replace_reel)
-        self.replace_button.pack(anchor=tk.W)
-
-        frame_label = ttk.Label(self, text='Frame:')
-        frame_label.grid(column=0, row=1)
-
-        count = ttk.Frame(self)
-        count.grid(column=1, row=1, sticky=tk.W)
-        self.film_frame = ttk.Label(count)
-        self.film_frame.pack(anchor=tk.W)
         self.frame_override_button = ttk.Button(
-            count, text='override', command=self.edit_count)
-        self.frame_override_button.pack(anchor=tk.W)
+            button_frame, text='Edit frame count', command=self.edit_count)
+        self.replace_button = ttk.Button(
+            button_frame, text='Replace reel', command=self.replace_reel)
+
+        info_frame.grid(row=0, column=0, sticky=tk.W, padx=8, pady=6)
+        button_frame.grid(row=1, column=0, sticky=tk.W, padx=4, pady=3)
+
+        self.description.grid(row=0, column=0, sticky=tk.W)
+        self.loaded_label.grid(row=1, column=0, sticky=tk.W)
+        self.film_frame.grid(row=2, column=0, sticky=tk.W)
+
+        self.frame_override_button.grid(row=0, column=0)
+        self.replace_button.grid(row=0, column=1)
 
     def edit_count(self):
         if self.frame_override_popup is not None:
@@ -177,7 +173,9 @@ class ReelInfo(ttk.Frame):
         self.replace_button.config(state=tk.NORMAL)
 
     def update(self, reel):
-        self.description.config(text=reel.description)
-        self.loaded.config(text=time.ctime(reel.loaded_at))
-        self.film_frame.config(text='{} (of {})'.format(
-            reel.current_frame, reel.total_frames))
+        self.description.config(text='Reel: {}'.format(reel.description))
+        self.loaded_label.config(
+            text='Loaded: {}'.format(time.ctime(reel.loaded_at)))
+        self.film_frame.config(text='Frame: {} of {} ({:.1%})'.format(
+            reel.current_frame, reel.total_frames,
+            reel.current_frame / float(reel.total_frames)))
