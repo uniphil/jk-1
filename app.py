@@ -501,14 +501,13 @@ class App(tk.Frame):
 class LoadReelPopup(tk.Toplevel):
     def __init__(self, device, close):
         tk.Toplevel.__init__(self)
+        self.close = close
+        self.title('Load {} reel...'.format(device))
         self.bind('<Destroy>', self.handle_destroy)
         self.bind('<Escape>', lambda _: self.cancel())
 
         frame = ttk.Frame(self)
         frame.pack(fill='both')
-
-        self.title('Load {} reel...'.format(device))
-        self.close = close
 
         title_label = ttk.Label(frame, text='New {} reel'.format(device))
         title_label.grid(column=1, row=0)
@@ -552,17 +551,55 @@ class LoadReelPopup(tk.Toplevel):
         new_reel = Reel(now, description, total_frames, current_frame)
         self.close(new_reel)
 
-    def validate_number(self):
-        print('ok', self)
-        return 'asdf'
+
+class OverrideFramePopup(tk.Toplevel):
+    def __init__(self, device, current_frame, close):
+        tk.Toplevel.__init__(self)
+        self.current_frame = current_frame
+        self.new_current_frame = tk.IntVar()
+        self.new_current_frame.set(current_frame.get())
+        self.close = close
+
+        self.title('Override current {} frame'.format(device))
+        self.bind('<Destroy>', self.handle_destroy)
+        self.bind('<Escape>', lambda _: self.cancel())
+
+        frame = ttk.Frame(self)
+        frame.pack(fill='both')
+
+        label = ttk.Label(frame, text='Current frame:')
+        label.grid(column=0, row=0, sticky=tk.E)
+        self.frame = ttk.Entry(frame, textvariable=self.new_current_frame)
+        self.frame.grid(column=1, row=0)
+        self.frame.focus()
+
+        buttons = ttk.Frame(frame)
+        buttons.grid(column=0, columnspan=2, row=1)
+        cancel = ttk.Button(buttons, text='Cancel', command=self.cancel)
+        cancel.pack(side='left')
+        save = ttk.Button(buttons, text='Save', command=self.save)
+        save.pack(side='right')
+
+    def handle_destroy(self, event):
+        if event.widget is self:
+            self.cancel()
+
+    def cancel(self):
+        self.close()
+
+    def save(self):
+        self.current_frame.set(self.new_current_frame.get())
+        self.close()
 
 
 class ReelInfo(ttk.LabelFrame):
-    def __init__(self, master, device, reel, update_reel):
+    def __init__(self, master, device, reel, current_frame, update_reel):
         ttk.LabelFrame.__init__(self, master, relief='solid', borderwidth=2)
         self.device = device
+        self.current_frame = current_frame
         self.update_reel = update_reel
         self.reel_popup = None
+        self.frame_override_popup = None
         self.create_widgets()
         self.update(reel)
 
@@ -579,19 +616,26 @@ class ReelInfo(ttk.LabelFrame):
         count = ttk.Frame(self)
         self.film_frame = ttk.Label(count)
         self.film_frame.pack(side='left')
-        film_frame_edit = ttk.Button(
+        self.frame_override_button = ttk.Button(
             count, text='override', command=self.edit_count)
-        film_frame_edit.pack(side='right')
+        self.frame_override_button.pack(side='right')
         count.pack(side='top')
 
         self.loaded = ttk.Label(self)
         self.loaded.pack(side='top')
 
     def edit_count(self):
-        fr = ttk.Frame(None)
-        b = ttk.Button(fr)
-        b.pack(side='bottom')
-        fr.pack()
+        if self.frame_override_popup is not None:
+            return
+        self.frame_override_popup = OverrideFramePopup(
+            self.device, self.current_frame, self.close_override_popup)
+        self.frame_override_popup.transient(self)
+        self.frame_override_button.config(state=tk.DISABLED)
+
+    def close_override_popup(self):
+        self.frame_override_popup.destroy()
+        self.frame_override_popup = None
+        self.frame_override_button.config(state=tk.NORMAL)
 
     def load_reel(self):
         if self.reel_popup is not None:
@@ -620,9 +664,15 @@ class A2(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.camera_reel = Reel(1555456657, 'test cam', 1800, 1)
+        self.camera_current_frame = tk.IntVar()
+        self.camera_current_frame.set(self.camera_reel.current_frame)
+        self.camera_current_frame.trace('w', self.update_camera_frame)
         self.camera_enable_manual = tk.BooleanVar()
         self.camera_enable_manual.set(False)
         self.projector_reel = Reel(1555456657, 'test pro', 2400, 870)
+        self.projector_current_frame = tk.IntVar()
+        self.projector_current_frame.set(self.projector_reel.current_frame)
+        self.projector_current_frame.trace('w', self.update_projector_frame)
         self.create_widgets()
         self.pack(fill='both')
 
@@ -632,7 +682,7 @@ class A2(ttk.Frame):
         camera_label.pack()
         self.camera_reel_widget = ReelInfo(
             self.camera_frame, 'camera', self.camera_reel,
-            self.replace_camera_reel)
+            self.camera_current_frame, self.replace_camera_reel)
         self.camera_reel_widget.pack()
 
         camera_manual = ttk.Frame(self.camera_frame)
@@ -651,7 +701,7 @@ class A2(ttk.Frame):
         projector_label.pack()
         self.projector_reel_widget = ReelInfo(
             self.projector_frame, 'crojector', self.projector_reel,
-            self.replace_projector_reel)
+            self.projector_current_frame, self.replace_projector_reel)
         self.projector_reel_widget.pack()
         self.projector_frame.pack(side='right')
 
@@ -668,6 +718,14 @@ class A2(ttk.Frame):
     def replace_projector_reel(self, reel):
         self.projector_reel = reel
         self.projector_reel_widget.update(reel)
+
+    def update_camera_frame(self, *_):
+        self.camera_reel.current_frame = self.camera_current_frame.get()
+        self.camera_reel_widget.update_reel(self.camera_reel)
+
+    def update_projector_frame(self, *_):
+        self.projector_reel.current_frame = self.projector_current_frame.get()
+        self.projector_reel_widget.update_reel(self.projector_reel)
 
     def heya(self):
         print 'sup', self
