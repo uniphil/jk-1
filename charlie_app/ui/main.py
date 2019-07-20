@@ -14,6 +14,7 @@ class App(ttk.Frame):
         self.camera_current_frame.trace('w', self.update_camera_frame)
         self.camera_enable_manual = tk.BooleanVar()
         self.camera_enable_manual.set(False)
+        self.camera_enable_manual.trace('w', self.blah)
         self.projector_reel = Reel(1555456657, 'test pro', 2400, 870)
         self.projector_current_frame = tk.IntVar()
         self.projector_current_frame.set(self.projector_reel.current_frame)
@@ -22,36 +23,36 @@ class App(ttk.Frame):
         self.pack(fill='both')
 
     def create_widgets(self):
-        self.camera_frame = ttk.Frame(self)
-        camera_label = ttk.Label(self.camera_frame, text='Camera')
-        camera_label.pack()
+        camera_frame = ttk.Frame(self)
+        projector_frame = ttk.Frame(self)
+        manual_frame = ttk.Frame(self)
+
+        camera_label = ttk.Label(camera_frame, text='Camera')
         self.camera_reel_widget = ReelInfo(
-            self.camera_frame, 'camera', self.camera_reel,
+            camera_frame, 'camera', self.camera_reel,
             self.camera_current_frame, self.replace_camera_reel)
-        self.camera_reel_widget.pack()
 
-        camera_manual = ttk.Frame(self.camera_frame)
-        enable_manual = ttk.Checkbutton(
-            camera_manual, variable=self.camera_enable_manual,
-            text='Enable manual control')
-        enable_manual.pack(side='left')
-        self.camera_enable_manual.trace('w', self.blah)
-        # enable_manual.bind('<Change>', self.blah)
-        camera_manual.pack()
-
-        self.camera_frame.pack(side='left')
-
-        self.projector_frame = ttk.Frame(self)
-        projector_label = ttk.Label(self.projector_frame, text='Projector')
-        projector_label.pack()
+        projector_label = ttk.Label(projector_frame, text='Projector')
         self.projector_reel_widget = ReelInfo(
-            self.projector_frame, 'crojector', self.projector_reel,
+            projector_frame, 'crojector', self.projector_reel,
             self.projector_current_frame, self.replace_projector_reel)
-        self.projector_reel_widget.pack()
-        self.projector_frame.pack(side='right')
 
-        self.program_frame = ttk.Frame(self)
-        self.program_frame.pack(side='bottom')
+        enable_manual = ttk.Checkbutton(
+            manual_frame, variable=self.camera_enable_manual,
+            text='Enable manual control')
+
+        camera_frame.grid(row=0, column=0)
+        projector_frame.grid(row=0, column=1)
+        manual_frame.grid(row=1, column=0, columnspan=2)
+
+        camera_label.grid(row=0, column=0)
+        self.camera_reel_widget.grid(row=1, column=0)
+
+        projector_label.grid(row=0, column=0)
+        self.projector_reel_widget.grid(row=1, column=0)
+
+        enable_manual.grid(row=0, column=0)
+
 
     def blah(self, x, y, z):
         print 'blah', x, y, z
