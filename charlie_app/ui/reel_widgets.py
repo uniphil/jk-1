@@ -75,16 +75,28 @@ class OverrideFramePopup(tk.Toplevel):
 
         label = ttk.Label(frame, text='Current frame:')
         label.grid(column=0, row=0, sticky=tk.E)
-        self.frame = ttk.Entry(frame, textvariable=self.new_current_frame)
-        self.frame.grid(column=1, row=0)
-        self.frame.focus()
+
+        minus = ttk.Button(frame, text='-', command=self.minus_one, width=1)
+        minus.grid(column=1, row=0)
+        self.frame_entry = ttk.Entry(
+            frame, textvariable=self.new_current_frame, width=5)
+        self.frame_entry.grid(column=2, row=0)
+        self.frame_entry.focus()
+        plus = ttk.Button(frame, text='+', command=self.plus_one, width=1)
+        plus.grid(column=3, row=0)
 
         buttons = ttk.Frame(frame)
-        buttons.grid(column=0, columnspan=2, row=1)
+        buttons.grid(column=0, columnspan=4, row=1)
         cancel = ttk.Button(buttons, text='Cancel', command=self.cancel)
         cancel.pack(side='left')
         save = ttk.Button(buttons, text='Save', command=self.save)
         save.pack(side='right')
+
+    def minus_one(self):
+        self.new_current_frame.set(self.new_current_frame.get() - 1)
+
+    def plus_one(self):
+        self.new_current_frame.set(self.new_current_frame.get() + 1)
 
     def handle_destroy(self, event):
         if event.widget is self:

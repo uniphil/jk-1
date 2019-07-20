@@ -1,7 +1,7 @@
 import Tkinter as tk
 import ttk
 
-from .reel import ReelInfo
+from .reel_widgets import ReelInfo
 from ..reel import Reel
 
 class App(ttk.Frame):
