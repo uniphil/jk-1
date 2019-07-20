@@ -498,11 +498,11 @@ class App(tk.Frame):
         self.pro_count["textvariable"] = self.pro_frames
 
 
-class LoadReelPopup(tk.Toplevel):
+class ReplaceReelPopup(tk.Toplevel):
     def __init__(self, device, close):
         tk.Toplevel.__init__(self)
         self.close = close
-        self.title('Load {} reel...'.format(device))
+        self.title('Replace {} reel...'.format(device))
         self.bind('<Destroy>', self.handle_destroy)
         self.bind('<Escape>', lambda _: self.cancel())
 
@@ -592,9 +592,9 @@ class OverrideFramePopup(tk.Toplevel):
         self.close()
 
 
-class ReelInfo(ttk.LabelFrame):
+class ReelInfo(ttk.Frame):
     def __init__(self, master, device, reel, current_frame, update_reel):
-        ttk.LabelFrame.__init__(self, master, relief='solid', borderwidth=2)
+        ttk.Frame.__init__(self, master, relief='solid', borderwidth=2)
         self.device = device
         self.current_frame = current_frame
         self.update_reel = update_reel
@@ -604,25 +604,31 @@ class ReelInfo(ttk.LabelFrame):
         self.update(reel)
 
     def create_widgets(self):
-        top = ttk.Frame()
-        top.pack(fill='x')
-        self.label = ttk.Label(top)
-        self.label.pack(side='left')
-        self.load_button = ttk.Button(
-            top, text='load new', command=self.load_reel)
-        self.load_button.pack(side='right')
-        self.config(labelwidget=top)
+        reel_label = ttk.Label(self, text='Reel:')
+        reel_label.grid(column=0, row=0)
+
+        reel_frame = ttk.Frame(self)
+        reel_frame.grid(column=1, row=0, sticky=tk.W)
+        self.description = ttk.Label(reel_frame)
+        self.description.pack(anchor=tk.W)
+
+        self.loaded = ttk.Label(reel_frame)
+        self.loaded.pack(anchor=tk.W)
+
+        self.replace_button = ttk.Button(
+            reel_frame, text='replace', command=self.replace_reel)
+        self.replace_button.pack(anchor=tk.W)
+
+        frame_label = ttk.Label(self, text='Frame:')
+        frame_label.grid(column=0, row=1)
 
         count = ttk.Frame(self)
+        count.grid(column=1, row=1, sticky=tk.W)
         self.film_frame = ttk.Label(count)
-        self.film_frame.pack(side='left')
+        self.film_frame.pack(anchor=tk.W)
         self.frame_override_button = ttk.Button(
             count, text='override', command=self.edit_count)
-        self.frame_override_button.pack(side='right')
-        count.pack(side='top')
-
-        self.loaded = ttk.Label(self)
-        self.loaded.pack(side='top')
+        self.frame_override_button.pack(anchor=tk.W)
 
     def edit_count(self):
         if self.frame_override_popup is not None:
@@ -637,26 +643,26 @@ class ReelInfo(ttk.LabelFrame):
         self.frame_override_popup = None
         self.frame_override_button.config(state=tk.NORMAL)
 
-    def load_reel(self):
+    def replace_reel(self):
         if self.reel_popup is not None:
             return
-        self.reel_popup = LoadReelPopup(self.device, self.close_load_popup)
+        self.reel_popup = ReplaceReelPopup(
+            self.device, self.close_replace_popup)
         self.reel_popup.transient(self)
-        self.load_button.config(state=tk.DISABLED)
+        self.replace_button.config(state=tk.DISABLED)
 
-    def close_load_popup(self, reel):
+    def close_replace_popup(self, reel):
         if reel is not None:
             self.update_reel(reel)
         self.reel_popup.destroy()
         self.reel_popup = None
-        self.load_button.config(state=tk.NORMAL)
+        self.replace_button.config(state=tk.NORMAL)
 
     def update(self, reel):
-        self.label.config(text='reel: {}'.format(reel.description))
-        self.film_frame.config(text='frame: {} (of {})'.format(
+        self.description.config(text=reel.description)
+        self.loaded.config(text=time.ctime(reel.loaded_at))
+        self.film_frame.config(text='{} (of {})'.format(
             reel.current_frame, reel.total_frames))
-        self.loaded.config(text='loaded: {}'.format(
-            time.ctime(reel.loaded_at)))
 
 
 class A2(ttk.Frame):
