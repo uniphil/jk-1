@@ -14,9 +14,6 @@ class App(ttk.Frame):
         self.camera_current_frame = tk.IntVar()
         self.camera_current_frame.set(self.camera_reel.current_frame)
         self.camera_current_frame.trace('w', self.update_camera_frame)
-        self.camera_enable_manual = tk.BooleanVar()
-        self.camera_enable_manual.set(False)
-        self.camera_enable_manual.trace('w', self.blah)
         self.projector_reel = Reel(1555456657, 'test pro', 2400, 870)
         self.projector_current_frame = tk.IntVar()
         self.projector_current_frame.set(self.projector_reel.current_frame)
@@ -40,10 +37,6 @@ class App(ttk.Frame):
             projector_frame, 'crojector', self.projector_reel,
             self.projector_current_frame, self.replace_projector_reel)
 
-        enable_manual = ttk.Checkbutton(
-            manual_frame, variable=self.camera_enable_manual,
-            text='Enable manual control')
-
         program = Program(program_frame)
 
         camera_frame.grid(row=0, column=0)
@@ -56,8 +49,6 @@ class App(ttk.Frame):
 
         projector_label.grid(row=0, column=0)
         self.projector_reel_widget.grid(row=1, column=0)
-
-        enable_manual.grid(row=0, column=0)
 
         program.grid()
 
