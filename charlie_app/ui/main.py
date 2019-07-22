@@ -2,6 +2,7 @@ import Tkinter as tk
 import ttk
 
 from .reel_widgets import ReelInfo
+from .program_widgets import Program
 from ..reel import Reel
 
 class App(ttk.Frame):
@@ -27,6 +28,7 @@ class App(ttk.Frame):
         camera_frame = ttk.Frame(self)
         projector_frame = ttk.Frame(self)
         manual_frame = ttk.Frame(self)
+        program_frame = ttk.Frame(self)
 
         camera_label = ttk.Label(camera_frame, text='Camera')
         self.camera_reel_widget = ReelInfo(
@@ -42,9 +44,12 @@ class App(ttk.Frame):
             manual_frame, variable=self.camera_enable_manual,
             text='Enable manual control')
 
+        program = Program(program_frame)
+
         camera_frame.grid(row=0, column=0)
         projector_frame.grid(row=0, column=1)
         manual_frame.grid(row=1, column=0, columnspan=2)
+        program_frame.grid(row=2, column=0, columnspan=2)
 
         camera_label.grid(row=0, column=0)
         self.camera_reel_widget.grid(row=1, column=0)
@@ -54,6 +59,7 @@ class App(ttk.Frame):
 
         enable_manual.grid(row=0, column=0)
 
+        program.grid()
 
     def blah(self, x, y, z):
         print 'blah', x, y, z

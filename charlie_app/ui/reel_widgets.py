@@ -81,7 +81,6 @@ class OverrideFramePopup(tk.Toplevel):
         self.frame_entry = ttk.Entry(
             frame, textvariable=self.new_current_frame, width=5)
         self.frame_entry.grid(column=2, row=0)
-        self.frame_entry.focus()
         plus = ttk.Button(frame, text='+', command=self.plus_one, width=1)
         plus.grid(column=3, row=0)
 
@@ -91,6 +90,9 @@ class OverrideFramePopup(tk.Toplevel):
         cancel.pack(side='left')
         save = ttk.Button(buttons, text='Save', command=self.save)
         save.pack(side='right')
+
+        self.frame_entry.focus()
+        self.frame_entry.icursor(tk.END)
 
     def minus_one(self):
         self.new_current_frame.set(self.new_current_frame.get() - 1)
