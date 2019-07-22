@@ -38,7 +38,7 @@ class App(ttk.Frame):
             projector_frame, 'crojector', self.projector_reel,
             self.projector_current_frame, self.replace_projector_reel)
 
-        program = Program(program_frame, self.camera_reel, self.projector_reel)
+        self.program = Program(program_frame, self.camera_reel, self.projector_reel)
 
         camera_frame.grid(row=0, column=0)
         projector_frame.grid(row=0, column=1)
@@ -51,7 +51,7 @@ class App(ttk.Frame):
         projector_label.grid(row=0, column=0)
         self.projector_reel_widget.grid(row=1, column=0)
 
-        program.grid()
+        self.program.grid()
 
     def blah(self, x, y, z):
         print 'blah', x, y, z
@@ -59,10 +59,12 @@ class App(ttk.Frame):
     def replace_camera_reel(self, reel):
         self.camera_reel = reel
         self.camera_reel_widget.update(reel)
+        self.program.update_camera_reel(reel)
 
     def replace_projector_reel(self, reel):
         self.projector_reel = reel
         self.projector_reel_widget.update(reel)
+        self.program.update_projector_reel(reel)
 
     def update_camera_frame(self, *_):
         self.camera_reel.current_frame = self.camera_current_frame.get()
@@ -71,6 +73,3 @@ class App(ttk.Frame):
     def update_projector_frame(self, *_):
         self.projector_reel.current_frame = self.projector_current_frame.get()
         self.projector_reel_widget.update_reel(self.projector_reel)
-
-    def heya(self):
-        print 'sup', self

@@ -23,6 +23,7 @@ class Program(ttk.Frame):
 
         self.rate_adjust.trace('w', self.update_rate)
         self.rate_inverse.trace('w', self.update_rate)
+        self.projector_reverse.trace('w', self.update_rate)
 
         self.create_widgets()
 
@@ -154,3 +155,11 @@ class Program(ttk.Frame):
         self.projector_frames_label.config(
             text='Frame {}–{} ({:.1%} of reel)'.format(
                 start_frame, end_frame, use))
+
+    def update_camera_reel(self, reel):
+        self.camera_reel = reel
+        self.update_camera_frame_label()
+
+    def update_projector_reel(self, reel):
+        self.projector_reel = reel
+        self.update_projector_frame_label()
