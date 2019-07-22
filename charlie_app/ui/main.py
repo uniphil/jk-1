@@ -5,6 +5,7 @@ from .reel_widgets import ReelInfo
 from .program_widgets import Program
 from ..reel import Reel
 
+
 class App(ttk.Frame):
 
     def __init__(self, master=None):
@@ -37,7 +38,7 @@ class App(ttk.Frame):
             projector_frame, 'crojector', self.projector_reel,
             self.projector_current_frame, self.replace_projector_reel)
 
-        program = Program(program_frame)
+        program = Program(program_frame, self.camera_reel, self.projector_reel)
 
         camera_frame.grid(row=0, column=0)
         projector_frame.grid(row=0, column=1)

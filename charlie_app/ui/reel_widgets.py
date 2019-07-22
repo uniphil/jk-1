@@ -4,6 +4,7 @@ import ttk
 
 from ..reel import Reel
 
+
 class ReplaceReelPopup(tk.Toplevel):
     def __init__(self, device, close):
         tk.Toplevel.__init__(self)

@@ -4,6 +4,7 @@ import tkFont
 
 from charlie_app import ui
 
+
 class LIFT(object):
     exposure_options = (
         ('Default', 0),
