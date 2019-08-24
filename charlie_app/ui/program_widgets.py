@@ -4,10 +4,11 @@ import ttk
 
 
 class Program(ttk.Frame):
-    def __init__(self, master, camera_reel, projector_reel):
+    def __init__(self, master, camera_reel, projector_reel, on_run):
         ttk.Frame.__init__(self, master)
         self.camera_reel = camera_reel
         self.projector_reel = projector_reel
+        self.on_run = on_run
 
         self.camera_total_frames = tk.IntVar()
         self.camera_total_frames.set(1)
@@ -74,7 +75,7 @@ class Program(ttk.Frame):
         self.projector_frames_label.grid(row=1, column=0, columnspan=3)
 
         run_button = ttk.Button(
-            self, text='Run program')
+            self, text='Run program', command=self.run_program)
 
         title.grid(row=0, column=0, columnspan=3)
 
@@ -125,6 +126,18 @@ class Program(ttk.Frame):
         self.rate_adjust.set(current_rate)
         self.update_camera_frame_label()
         self.update_projector_frame_label()
+
+    def run_program(self):
+        print 'go time'
+        cam_frames = self.camera_total_frames.get()
+        proj_frames = self.projector_total_frames.get()
+        rate = self.rate_adjust.get()
+        if self.rate_inverse.get():
+            program = [(rate, 1) for _ in range(proj_frames)]
+        else:
+            program = [(1, rate) for _ in range(cam_frames)]
+        projector_reverse = self.projector_reverse.get()
+        self.on_run(program, projector_reverse)
 
     def update_rate(self, *args):
         rate = self.rate_adjust.get()
