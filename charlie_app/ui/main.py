@@ -6,7 +6,6 @@ from serial import Serial
 from .reel_widgets import ReelInfo
 from .program_widgets import Program
 from .status_bar import StatusBar
-from ..reel import Reel
 from .. import k103
 
 
@@ -14,19 +13,22 @@ class App(ttk.Frame):
     def __init__(self, serial_port=None):
         ttk.Frame.__init__(self, None)
         self.serial = None
+        if serial_port is not None:
+            self.connect_serial(serial_port)
+        else:
+            print 'noooooo'
+
         self.master.title('Charlie control')
-        self.camera_reel = Reel(1555456657, 'demo camera reel', 1800, 1)
+        self.camera_reel = k103.get_reel(self.serial, 'C')
         self.camera_current_frame = tk.IntVar()
         self.camera_current_frame.set(self.camera_reel.current_frame)
         self.camera_current_frame.trace('w', self.update_camera_frame)
-        self.projector_reel = Reel(1555456657, 'demo projector reel', 2400, 1)
+        self.projector_reel = k103.get_reel(self.serial, 'P')
         self.projector_current_frame = tk.IntVar()
         self.projector_current_frame.set(self.projector_reel.current_frame)
         self.projector_current_frame.trace('w', self.update_projector_frame)
         self.create_widgets()
         self.grid()
-        if serial_port is not None:
-            self.connect_serial(serial_port)
 
     def create_widgets(self):
         camera_frame = ttk.Frame(self)
