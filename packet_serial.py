@@ -1,6 +1,7 @@
 import logging
 from serial.threaded import Protocol
 
+# logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('packetizer')
 
@@ -118,7 +119,7 @@ class _Packetizer(Protocol):
             logger.info('log: {!r}'.format(bytes(data)))
 
     def handle_incomplete(self, bytes):
-        logger.error('Incomplete packet. Garbage:\n{}'.format(
+        logger.error('Incomplete packet:\n{}'.format(
             '\n'.join(BYTE_DEBUG_FMT.format(b) for b in bytes)))
 
     def handle_unexpected_bytes(self, data):

@@ -39,8 +39,9 @@ class Reel(object):
 
     def to_bytes(self):
         ascii_desc = self.description.encode('ascii')
-        return pack(self.BYTES_FMT,
-            self.loaded_at, ascii_desc, self.total_frames, self.current_frame)
+        return pack(
+            self.BYTES_FMT, self.loaded_at, ascii_desc, self.total_frames,
+            self.current_frame)
 
     @staticmethod
     def from_bytes(b):
