@@ -31,9 +31,17 @@ def handle_packet(bs):
                 print reel
         else:
             raise NotImplementedError(
-                'reel command (0x{0:02X} {0:d} {0:c}) not there yet'.format(cmd))
+                'reel command (0x{0:02X} {0:d} {0:c}) not there yet'.format(
+                    cmd))
     elif target == FRAME_CMD:
-        raise NotImplementedError('frame commands not quite there yet')
+        cmd = stuff.next()
+        if cmd == ord('i'):
+            print '{:c} frame: {}'.format(
+                stuff.next(), Reel.frame_from_bytes(bytearray(stuff)))
+        else:
+            raise NotImplementedError(
+                'frame command (0x{0:02X} {0:d} {0:c}) not there yet'.format(
+                    cmd))
     else:
         print 'woo got packet:'
         print '\n'.join('  0x{0:02X}  {0:3d}  {0:c}'.format(b) for b in bs)
@@ -62,13 +70,17 @@ if __name__ == '__main__':
 
     with ReaderThread(s, Packetizer(handle_packet)) as device:
         sleep(2)
-        reel = Reel(
-            mktime((2019, 05, 16, 0, 0, 0, 0, 0, -1)),
-            'asdfasdfasdf',
-            100, 50)
+        # reel = Reel(
+        #     mktime((2019, 05, 16, 0, 0, 0, 0, 0, -1)),
+        #     'asdfasdfasdf',
+        #     100, 50)
         # device.send(k103.update_reel('P', reel))
-        device.send(k103.get_reel('P'))
+        device.send(k103.advance('C', -4))
         while True:
+            device.send(k103.get_frame('C'))
+            # device.send(k103.get_frame('P'))
+            # device.send(k103.get_reel('C'))
+            # device.send(k103.get_reel('P'))
             sleep(2)
             # device.send('.')
 

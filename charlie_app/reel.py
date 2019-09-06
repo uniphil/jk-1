@@ -11,7 +11,9 @@ THIS_SOFTWARE_EPOCH = mktime((  # validity check: no reel could be loaded before
 
 
 class Reel(object):
-    BYTES_FMT = 'I 20s i i'
+    ADVANCE_NUMBER_FMT = 'h'
+    FRAME_FMT = 'i'
+    BYTES_FMT = 'I 20s i {}'.format(FRAME_FMT)
 
     def __init__(self, loaded_at, description, total_frames, current_frame):
         assert loaded_at > THIS_SOFTWARE_EPOCH,\
@@ -49,6 +51,16 @@ class Reel(object):
         loaded_at, description, total_frames, current_frame =\
             unpack(Reel.BYTES_FMT, b)
         return Reel(loaded_at, description, total_frames, current_frame)
+
+    @staticmethod
+    def frame_from_bytes(b):
+        assert len(b) == 4, 'frame no must be 4 bytes long {}'.format(len(b))
+        frame, = unpack(Reel.FRAME_FMT, b)
+        return frame
+
+    @staticmethod
+    def pack_advance_number(n):
+        return pack(Reel.ADVANCE_NUMBER_FMT, n)
 
 
 if __name__ == '__main__':
@@ -120,8 +132,7 @@ if __name__ == '__main__':
             r = Reel.from_bytes(r_ok())
             self.assertEqual(r.to_bytes(), r_ok())
 
-
     unittest.main()
 
-    print r
-    print unpack('i', r.to_bytes()[12:16])
+    # print r
+    # print unpack('i', r.to_bytes()[12:16])
