@@ -4,10 +4,15 @@ import ttk
 
 
 class Program(ttk.Frame):
-    def __init__(self, master, camera_reel, projector_reel, on_run):
+    def __init__(
+        self, master, camera_reel, camera_current_frame,
+        projector_reel, projector_current_frame, on_run,
+    ):
         ttk.Frame.__init__(self, master)
         self.camera_reel = camera_reel
+        self.camera_current_frame = camera_current_frame
         self.projector_reel = projector_reel
+        self.projector_current_frame = projector_current_frame
         self.on_run = on_run
 
         self.camera_total_frames = tk.IntVar()
@@ -152,9 +157,10 @@ class Program(ttk.Frame):
 
     def update_camera_frame_label(self, *args):
         camera_frames = self.camera_total_frames.get()
-        start_frame = 0  # self.camera_reel.current_frame
+        start_frame = self.camera_current_frame.get()
         end_frame = start_frame + camera_frames
-        use = 0  # float(camera_frames) / self.camera_reel.total_frames
+        use = float(camera_frames) / self.camera_reel.total_frames\
+            if self.camera_reel is not None else 0
         self.camera_frames_label.config(
             text='Frame {}–{} ({:.1%} of reel)'.format(
                 start_frame, end_frame, use))
@@ -162,9 +168,10 @@ class Program(ttk.Frame):
     def update_projector_frame_label(self, *args):
         frames = self.projector_total_frames.get()
         reverse = self.projector_reverse.get()
-        start_frame = 0  #self.projector_reel.current_frame
-        end_frame = start_frame + (-frames if reverse else frames) 
-        use = 0  # float(frames) / self.projector_reel.total_frames
+        start_frame = self.camera_current_frame.get()
+        end_frame = start_frame + (-frames if reverse else frames)
+        use = float(frames) / self.projector_reel.total_frames\
+            if self.projector_reel is not None else 0
         self.projector_frames_label.config(
             text='Frame {}–{} ({:.1%} of reel)'.format(
                 start_frame, end_frame, use))

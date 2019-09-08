@@ -63,7 +63,8 @@ class App(ttk.Frame):
         self.projector_reel_widget = None
 
         self.program = Program(
-            program_frame, self.camera_reel, self.projector_reel,
+            program_frame, self.camera_reel, self.camera_current_frame,
+            self.projector_reel, self.projector_current_frame,
             self.run_program)
 
         # self.status_bar = StatusBar(
