@@ -109,8 +109,7 @@ class OverrideFramePopup(tk.Toplevel):
         self.close()
 
     def save(self):
-        self.current_frame.set(self.new_current_frame.get())
-        self.close()
+        self.close(self.new_current_frame.get())
 
 
 class ManualControlPopup(tk.Toplevel):
@@ -191,12 +190,13 @@ class ManualControlPopup(tk.Toplevel):
 class ReelInfo(ttk.Frame):
     def __init__(
         self, master, device, reel, current_frame, update_reel,
-        advance_frames,
+        update_current_frame, advance_frames,
     ):
         ttk.Frame.__init__(self, master, relief='solid', borderwidth=2)
         self.device = device
         self.current_frame = current_frame
         self.update_reel = update_reel
+        self.update_current_frame = update_current_frame
         self.advance_frames = advance_frames
         self.reel_popup = None
         self.frame_override_popup = None
@@ -248,7 +248,9 @@ class ReelInfo(ttk.Frame):
         self.frame_override_popup.transient(self)
         self.frame_override_button.config(state=tk.DISABLED)
 
-    def close_override_popup(self):
+    def close_override_popup(self, new_current_frame=None):
+        if new_current_frame is not None:
+            self.update_current_frame(new_current_frame)
         self.frame_override_popup.destroy()
         self.frame_override_popup = None
         self.frame_override_button.config(state=tk.NORMAL)

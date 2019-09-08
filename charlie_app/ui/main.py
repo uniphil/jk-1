@@ -38,7 +38,7 @@ class App(ttk.Frame):
         self.camera_reel_widget = ReelInfo(
             self.camera_frame, 'camera', self.camera_reel,
             self.camera_current_frame, self.replace_camera_reel,
-            self.handle_advance_frames)
+            self.override_camera_frame, self.handle_advance_frames)
         self.camera_reel_widget.grid(row=1, column=0)
 
     def init_projector_reel(self, reel):
@@ -46,7 +46,7 @@ class App(ttk.Frame):
         self.projector_reel_widget = ReelInfo(
             self.projector_frame, 'projector', self.projector_reel,
             self.projector_current_frame, self.replace_projector_reel,
-            self.handle_advance_frames)
+            self.override_projector_frame, self.handle_advance_frames)
         self.projector_reel_widget.grid(row=1, column=0)
 
     def create_widgets(self):
@@ -162,6 +162,14 @@ class App(ttk.Frame):
             self.device.send(k103.update_reel('P', reel))
         self.projector_current_frame.set(reel.current_frame)
         self.program.update_projector_reel(reel)
+
+    def override_camera_frame(self, new_frame):
+        self.camera_reel.current_frame = new_frame
+        self.replace_camera_reel(self.camera_reel)
+
+    def override_projector_frame(self, new_frame):
+        self.projector_reel.current_frame = new_frame
+        self.replace_projector_reel(self.projector_reel)
 
     def run_program(self, program, proj_rev=False):
         print 'running program...', program
