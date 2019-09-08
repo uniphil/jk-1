@@ -7,14 +7,6 @@ K103_SELECT = 'F'
 K103_SELECT_R = 'R'
 
 
-def capture(device, n):
-    return bytearray([
-        FRAME_CMD,
-        device,
-        n,
-    ])
-
-
 def get_reel(device):
     return bytearray([
         REEL_CMD,
@@ -45,3 +37,7 @@ def advance(device, n):
         '!',
         device,
     ]) + Reel.pack_advance_number(n)
+
+
+def dump(what):
+    return bytearray(['_', what])

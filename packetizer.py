@@ -1,7 +1,6 @@
 import logging
 from serial.threaded import Protocol
 
-# logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('packetizer')
 
@@ -32,15 +31,7 @@ def unstuff(stuffed):
     return out[:-1]
 
 
-def Packetizer(handle_packet):
-    def instantiate(*args, **kwargs):
-        instance = _Packetizer(*args, **kwargs)
-        setattr(instance, 'handle_packet', handle_packet)
-        return instance
-    return instantiate
-
-
-class _Packetizer(Protocol):
+class Packetizer(Protocol):
     def __init__(self):
         self.transport = None
         self.packet_started = False
@@ -53,7 +44,7 @@ class _Packetizer(Protocol):
 
     def connection_lost(self, exc):
         self.transport = None
-        super(_Packetizer, self).connection_lost(exc)
+        super(Packetizer, self).connection_lost(exc)
 
     def data_received(self, data):
         byte_data = bytearray(data)

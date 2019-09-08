@@ -75,9 +75,9 @@ if __name__ == '__main__':
         #     'asdfasdfasdf',
         #     100, 50)
         # device.send(k103.update_reel('P', reel))
-        device.send(k103.advance('C', -4))
+        device.send(k103.advance('P', 5))
         while True:
-            device.send(k103.get_frame('C'))
+            # device.send(k103.get_frame('C'))
             # device.send(k103.get_frame('P'))
             # device.send(k103.get_reel('C'))
             # device.send(k103.get_reel('P'))

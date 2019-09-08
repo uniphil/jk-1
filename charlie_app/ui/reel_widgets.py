@@ -113,20 +113,96 @@ class OverrideFramePopup(tk.Toplevel):
         self.close()
 
 
+class ManualControlPopup(tk.Toplevel):
+    def __init__(self, device, current_frame, advance, close):
+        tk.Toplevel.__init__(self)
+        self.current_frame = current_frame
+        self.title('Manual control: {}'.format(device))
+
+        self.advance = advance
+        self.close = close
+
+        self.reverse = tk.BooleanVar()
+        self.reverse.set(False)
+
+        self.frames_to_advance = tk.IntVar()
+        self.frames_to_advance.set(1)
+
+        self.reverse.trace('w', self.handle_set_frames)
+        self.bind('<Destroy>', self.handle_destroy)
+        self.bind('<Escape>', lambda _: self.done())
+
+        frame = ttk.Frame(self)
+        frame.pack(fill='both')
+
+        label = ttk.Label(
+            frame, text='Current frame: {}'.format(self.get_frames()))
+        label.grid(column=0, row=0, sticky=tk.E)
+
+        reverse_option = ttk.Checkbutton(
+            frame, text='Reverse', variable=self.reverse)
+        reverse_option.grid(column=1, row=0)
+
+        frame_num_entry = ttk.Entry(
+            frame, textvariable=self.frames_to_advance, width=8)
+        frame_num_entry.bind('<KeyRelease>', self.handle_set_frames)
+        frame_num_entry.bind('<FocusOut>', self.handle_set_frames)
+        frame_num_entry.grid(column=0, row=1)
+
+        self.advance_button = ttk.Button(
+            frame,
+            text='Advance {} frames'.format(self.frames_to_advance.get()),
+            command=self.handle_advance)
+        self.advance_button.grid(column=0, columnspan=2, row=2)
+
+        buttons = ttk.Frame(frame)
+        buttons.grid(column=0, columnspan=4, row=4)
+
+        done = ttk.Button(buttons, text='Done', command=self.done)
+        done.pack(side='bottom')
+
+    def get_frames(self):
+        n = self.frames_to_advance.get()
+        if self.reverse.get():
+            n *= -1
+        return n
+
+    def handle_advance(self):
+        self.advance(self.get_frames())
+
+    def handle_set_frames(self, *args):
+        action = 'Reverse' if self.reverse.get() else 'Advance'
+        self.advance_button.config(
+            text='{} {} frames'.format(action, self.get_frames()))
+
+    def handle_destroy(self, event):
+        if event.widget is self:
+            self.done()
+
+    def done(self):
+        self.close()
+
+
 class ReelInfo(ttk.Frame):
-    def __init__(self, master, device, reel, current_frame, update_reel):
+    def __init__(
+        self, master, device, reel, current_frame, update_reel,
+        advance_frames,
+    ):
         ttk.Frame.__init__(self, master, relief='solid', borderwidth=2)
         self.device = device
         self.current_frame = current_frame
         self.update_reel = update_reel
+        self.advance_frames = advance_frames
         self.reel_popup = None
         self.frame_override_popup = None
+        self.manual_control_popup = None
         self.create_widgets()
         self.update(reel)
 
     def create_widgets(self):
         info_frame = ttk.Frame(self)
         button_frame = ttk.Frame(self)
+        manual_frame = ttk.Frame(self)
 
         self.description = ttk.Label(info_frame)
         self.loaded_label = ttk.Label(info_frame)
@@ -137,8 +213,12 @@ class ReelInfo(ttk.Frame):
         self.replace_button = ttk.Button(
             button_frame, text='Replace reel', command=self.replace_reel)
 
+        self.manual_button = ttk.Button(
+            manual_frame, text='Manual control', command=self.control_manually)
+
         info_frame.grid(row=0, column=0, sticky=tk.W, padx=8, pady=6)
         button_frame.grid(row=1, column=0, sticky=tk.W, padx=4, pady=3)
+        manual_frame.grid(row=2, column=0, columnspan=2)
 
         self.description.grid(row=0, column=0, sticky=tk.W)
         self.loaded_label.grid(row=1, column=0, sticky=tk.W)
@@ -146,6 +226,14 @@ class ReelInfo(ttk.Frame):
 
         self.frame_override_button.grid(row=0, column=0)
         self.replace_button.grid(row=0, column=1)
+
+        self.manual_button.grid()
+
+    def handle_advance(self, n):
+        if (self.device == 'camera'):
+            self.advance_frames('C', n)
+        else:
+            self.advance_frames('P', n)
 
     def edit_count(self):
         if self.frame_override_popup is not None:
@@ -174,6 +262,22 @@ class ReelInfo(ttk.Frame):
         self.reel_popup.destroy()
         self.reel_popup = None
         self.replace_button.config(state=tk.NORMAL)
+
+    def control_manually(self):
+        if self.manual_control_popup is not None:
+            return
+        self.manual_control_popup = ManualControlPopup(
+            self.device, self.current_frame, self.handle_advance,
+            self.close_manual_control)
+        self.manual_control_popup.transient(self)
+        self.manual_button.config(state=tk.DISABLED)
+
+    def close_manual_control(self):
+        if self.manual_control_popup is None:
+            return
+        self.manual_control_popup.destroy()
+        self.manual_control_popup = None
+        self.manual_button.config(state=tk.NORMAL)
 
     def update(self, reel):
         self.description.config(text='Reel: {}'.format(reel.description))

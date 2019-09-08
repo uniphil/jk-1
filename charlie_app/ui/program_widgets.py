@@ -152,9 +152,9 @@ class Program(ttk.Frame):
 
     def update_camera_frame_label(self, *args):
         camera_frames = self.camera_total_frames.get()
-        start_frame = self.camera_reel.current_frame
+        start_frame = 0  # self.camera_reel.current_frame
         end_frame = start_frame + camera_frames
-        use = float(camera_frames) / self.camera_reel.total_frames
+        use = 0  # float(camera_frames) / self.camera_reel.total_frames
         self.camera_frames_label.config(
             text='Frame {}–{} ({:.1%} of reel)'.format(
                 start_frame, end_frame, use))
@@ -162,9 +162,9 @@ class Program(ttk.Frame):
     def update_projector_frame_label(self, *args):
         frames = self.projector_total_frames.get()
         reverse = self.projector_reverse.get()
-        start_frame = self.projector_reel.current_frame
+        start_frame = 0  #self.projector_reel.current_frame
         end_frame = start_frame + (-frames if reverse else frames) 
-        use = float(frames) / self.projector_reel.total_frames
+        use = 0  # float(frames) / self.projector_reel.total_frames
         self.projector_frames_label.config(
             text='Frame {}–{} ({:.1%} of reel)'.format(
                 start_frame, end_frame, use))
