@@ -129,15 +129,16 @@ class ManualControlPopup(tk.Toplevel):
         self.frames_to_advance.set(1)
 
         self.reverse.trace('w', self.handle_set_frames)
+        self.current_frame.trace('w', self.handle_current_frame)
         self.bind('<Destroy>', self.handle_destroy)
         self.bind('<Escape>', lambda _: self.done())
 
         frame = ttk.Frame(self)
         frame.pack(fill='both')
 
-        label = ttk.Label(
-            frame, text='Current frame: {}'.format(self.get_frames()))
-        label.grid(column=0, row=0, sticky=tk.E)
+        self.current_frame_label = ttk.Label(
+            frame, text='Current frame: {}'.format(self.current_frame.get()))
+        self.current_frame_label.grid(column=0, row=0, sticky=tk.E)
 
         reverse_option = ttk.Checkbutton(
             frame, text='Reverse', variable=self.reverse)
@@ -170,10 +171,14 @@ class ManualControlPopup(tk.Toplevel):
     def handle_advance(self):
         self.advance(self.get_frames())
 
+    def handle_current_frame(self, *args):
+        self.current_frame_label.config(
+            text='Current frame: {}'.format(self.current_frame.get()))
+
     def handle_set_frames(self, *args):
         action = 'Reverse' if self.reverse.get() else 'Advance'
         self.advance_button.config(
-            text='{} {} frames'.format(action, self.get_frames()))
+            text='{} {} frames'.format(action, self.frames_to_advance.get()))
 
     def handle_destroy(self, event):
         if event.widget is self:
@@ -284,5 +289,5 @@ class ReelInfo(ttk.Frame):
         self.loaded_label.config(
             text='Loaded: {}'.format(time.ctime(reel.loaded_at)))
         self.film_frame.config(text='Frame: {} of {} ({:.1%})'.format(
-            reel.current_frame, reel.total_frames,
-            reel.current_frame / float(reel.total_frames)))
+            self.current_frame.get(), reel.total_frames,
+            self.current_frame.get() / float(reel.total_frames)))

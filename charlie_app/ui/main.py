@@ -109,9 +109,9 @@ class App(ttk.Frame):
         elif target == FRAME_CMD:
             cmd = stuff.next()
             if cmd == ord('i'):
-                reel_id = stuff.next()
-                reel = Reel.frame_from_bytes(bytearray(stuff))
-                self.handle_reel_frame_update(reel_id, reel)
+                reel_id = chr(stuff.next())
+                frame = Reel.frame_from_bytes(bytearray(stuff))
+                self.handle_reel_frame_update(reel_id, frame)
             else:
                 raise NotImplementedError(
                     'frame command (0x{0:02X} {0:d} {0:c}) not working'.format(
@@ -127,29 +127,40 @@ class App(ttk.Frame):
     def handle_reel_update(self, reel_id, reel):
         assert reel_id in ('C', 'P')
         if reel_id == 'C':
-            self.replace_camera_reel(reel)
+            self.replace_camera_reel(reel, False)
         else:
-            self.replace_projector_reel(reel)
+            self.replace_projector_reel(reel, False)
+
+    def handle_reel_frame_update(self, reel_id, frame):
+        assert reel_id in ('C', 'P')
+        if reel_id == 'C':
+            self.camera_current_frame.set(frame)
+        else:
+            self.projector_current_frame.set(frame)
 
     def blah(self, x, y, z):
         print 'blah', x, y, z
 
-    def replace_camera_reel(self, reel):
+    def replace_camera_reel(self, reel, persist=True):
         if self.camera_reel is None:
             self.init_camera_reel(reel)
         else:
             self.camera_reel = reel
             self.camera_reel_widget.update(reel)
-        self.device.send(k103.update_reel('C', reel))
+        if persist:
+            self.device.send(k103.update_reel('C', reel))
+        self.camera_current_frame.set(reel.current_frame)
         self.program.update_camera_reel(reel)
 
-    def replace_projector_reel(self, reel):
+    def replace_projector_reel(self, reel, persist=True):
         if self.projector_reel is None:
             self.init_projector_reel(reel)
         else:
             self.projector_reel = reel
             self.projector_reel_widget.update(reel)
-        self.device.send(k103.update_reel('P', reel))
+        if persist:
+            self.device.send(k103.update_reel('P', reel))
+        self.projector_current_frame.set(reel.current_frame)
         self.program.update_projector_reel(reel)
 
     def run_program(self, program, proj_rev=False):
