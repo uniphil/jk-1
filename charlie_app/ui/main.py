@@ -130,6 +130,7 @@ class App(ttk.Frame):
         self.device.send(k103.advance(reel_id, n))
 
     def handle_busy(self, device):
+        print 'busy!', device
         popup = tk.Toplevel()
         popup.title('device busy')
         name = 'projector' if device == 'P' else 'camera'
@@ -194,11 +195,11 @@ class App(ttk.Frame):
         def run_projector_program():
             print 'projector: {}'.format(n_proj)
             self.device.send(k103.advance('P', n_proj))
-            self.after(750 + 1400 * n_proj, next_program_step)
+            self.after(750 + 1400 * abs(n_proj), next_program_step)
 
         print 'camera: {}'.format(n_cam)
         self.device.send(k103.advance('C', n_cam))
-        self.after(1000 * n_cam, run_projector_program)
+        self.after(1000 * abs(n_cam), run_projector_program)
 
     def run_program(self, program):
         print 'run program', program

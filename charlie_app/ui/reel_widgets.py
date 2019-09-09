@@ -171,8 +171,11 @@ class ManualControlPopup(tk.Toplevel):
         self.advance(self.get_frames())
 
     def handle_current_frame(self, *args):
-        self.current_frame_label.config(
-            text='Current frame: {}'.format(self.current_frame.get()))
+        if self.current_frame is None:
+            print 'waaaaat'
+        else:
+            self.current_frame_label.config(
+                text='Current frame: {}'.format(self.current_frame.get()))
 
     def handle_set_frames(self, *args):
         action = 'Reverse' if self.reverse.get() else 'Advance'

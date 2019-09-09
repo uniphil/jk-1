@@ -137,11 +137,11 @@ class Program(ttk.Frame):
         cam_frames = self.camera_total_frames.get()
         proj_frames = self.projector_total_frames.get()
         rate = self.rate_adjust.get()
+        proj_direction = -1 if self.projector_reverse.get() else 1
         if self.rate_inverse.get():
-            program = [(rate, 1) for _ in range(proj_frames)]
+            program = [(rate, 1 * proj_direction) for _ in range(proj_frames)]
         else:
-            program = [(1, rate) for _ in range(cam_frames)]
-        # projector_reverse = self.projector_reverse.get()
+            program = [(1, rate * proj_direction) for _ in range(cam_frames)]
         self.on_run(program)
 
     def update_rate(self, *args):
