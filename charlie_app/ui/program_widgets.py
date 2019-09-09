@@ -54,10 +54,10 @@ class Program(ttk.Frame):
         self.camera_frames_label.grid(row=1, column=0, columnspan=2)
 
         faster_button = ttk.Button(
-            rate_frame, text='Faster', command=self.adjust_rate_faster)
+            rate_frame, text='+', command=self.adjust_rate_faster)
         self.rate_label = ttk.Label(rate_frame)
         slower_button = ttk.Button(
-            rate_frame, text='Slower', command=self.adjust_rate_slower)
+            rate_frame, text='-', command=self.adjust_rate_slower)
         faster_button.grid(row=0, column=0)
         self.rate_label.grid(row=1, column=0)
         slower_button.grid(row=2, column=0)
@@ -141,8 +141,8 @@ class Program(ttk.Frame):
             program = [(rate, 1) for _ in range(proj_frames)]
         else:
             program = [(1, rate) for _ in range(cam_frames)]
-        projector_reverse = self.projector_reverse.get()
-        self.on_run(program, projector_reverse)
+        # projector_reverse = self.projector_reverse.get()
+        self.on_run(program)
 
     def update_rate(self, *args):
         rate = self.rate_adjust.get()

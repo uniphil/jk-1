@@ -112,18 +112,32 @@ class App(ttk.Frame):
             if cmd == ord('i'):
                 reel_id = chr(stuff.next())
                 frame = Reel.frame_from_bytes(bytearray(stuff))
+                print 'frame update', reel_id, frame
                 self.handle_reel_frame_update(reel_id, frame)
             else:
                 raise NotImplementedError(
                     'frame command (0x{0:02X} {0:d} {0:c}) not working'.format(
                         cmd))
+        elif target == ord('B'):
+            device = stuff.next()
+            self.handle_busy(chr(device))
         else:
-            print 'woo got packet:'
+            print 'woo got unrecognized packet:'
             print '\n'.join('  0x{0:02X}  {0:3d}  {0:c}'.format(b) for b in bs)
 
     def handle_advance_frames(self, reel_id, n):
         print 'advancing', reel_id, n, 'frames'
         self.device.send(k103.advance(reel_id, n))
+
+    def handle_busy(self, device):
+        popup = tk.Toplevel()
+        popup.title('device busy')
+        name = 'projector' if device == 'P' else 'camera'
+        text = '{} seems to be busy, try again in a moment?'.format(name)
+        frame = ttk.Frame(popup)
+        frame.pack(expand=True, ipadx=12, ipady=4)
+        ttk.Label(frame, text=text).pack(ipady=12)
+        ttk.Button(frame, text='Ok', command=lambda: popup.destroy()).pack()
 
     def handle_reel_update(self, reel_id, reel):
         assert reel_id in ('C', 'P')
@@ -172,19 +186,33 @@ class App(ttk.Frame):
         self.projector_reel.current_frame = new_frame
         self.replace_projector_reel(self.projector_reel)
 
-    def run_program(self, program, proj_rev=False):
-        print 'running program...', program
-        for n_cam, n_proj in program:
-            print 'camera:'
-            k103.capture(self.serial, k103.CAM_SELECT, n_cam)
-            print 'projector ({}):'.format('r' if proj_rev else 'f')
-            p_cmd = k103.K103_SELECT_R if proj_rev else k103.K103_SELECT
-            k103.capture(self.serial, p_cmd, n_proj)
+    def run_camera_program(self, n_cam, n_proj, remaining_program):
+        def next_program_step():
+            print '{} left'.format(len(remaining_program))
+            self.run_program(remaining_program)
+
+        def run_projector_program():
+            print 'projector: {}'.format(n_proj)
+            self.device.send(k103.advance('P', n_proj))
+            self.after(750 + 1400 * n_proj, next_program_step)
+
+        print 'camera: {}'.format(n_cam)
+        self.device.send(k103.advance('C', n_cam))
+        self.after(1000 * n_cam, run_projector_program)
+
+    def run_program(self, program):
+        print 'run program', program
+        try:
+            n_cam, n_proj = program.pop(0)
+        except IndexError:
+            print 'program done!'
+            return
+        self.run_camera_program(n_cam, n_proj, program)
 
     def update_camera_frame(self, *_):
         self.camera_reel.current_frame = self.camera_current_frame.get()
-        self.camera_reel_widget.update_reel(self.camera_reel)
+        self.camera_reel_widget.update(self.camera_reel)
 
     def update_projector_frame(self, *_):
         self.projector_reel.current_frame = self.projector_current_frame.get()
-        self.projector_reel_widget.update_reel(self.projector_reel)
+        self.projector_reel_widget.update(self.projector_reel)

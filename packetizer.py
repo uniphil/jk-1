@@ -118,7 +118,8 @@ class Packetizer(Protocol):
             bytes(data)))
 
     def send(self, data, mode=PACKET_NORMAL):
-        logger.debug('sending data:\n{}'.format(data))
+        logger.info('sending data:\n{} | {!r}'.format(
+            ' '.join('{:02X}'.format(d) for d in data), bytes(data)))
 
         assert len(data) <= 62, \
             'data must be 62 bytes or less to stuff, found {} bytes'.format(
