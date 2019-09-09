@@ -63,7 +63,8 @@ class App(ttk.Frame):
         self.projector_frame = ttk.Frame(self)
         manual_frame = ttk.Frame(self)
         program_frame = ttk.Frame(self)
-        self.status_bar = StatusBar(self, self.latest_update)
+        self.status_bar = StatusBar(
+            self, self.latest_update, self.handle_cancel)
 
         camera_label = ttk.Label(self.camera_frame, text='Camera')
         self.camera_reel_widget = None
@@ -124,6 +125,9 @@ class App(ttk.Frame):
                 frames = Reel.frame_from_bytes(bytearray(stuff))
                 print 'frame advance done', reel_id, frames
                 self.handle_advance_done(reel_id, frames)
+            elif cmd == ord('x'):
+                reel_id = chr(stuff.next())
+                self.handle_cancelled(reel_id)
             else:
                 raise NotImplementedError(
                     'frame command (0x{0:02X} {0:d} {0:c}) not working'.format(
@@ -165,6 +169,9 @@ class App(ttk.Frame):
             self.main_program_next()
         else:
             self._advance_frames_done()
+        name = 'projector' if reel_id == 'P' else 'camera'
+        self.latest_update.set(
+            'advanced {} {} frames in last program step'.format(n, name))
 
     def handle_busy(self, device):
         print 'busy!', device
@@ -176,6 +183,20 @@ class App(ttk.Frame):
         frame.pack(expand=True, ipadx=12, ipady=4)
         ttk.Label(frame, text=text).pack(ipady=12)
         ttk.Button(frame, text='Ok', command=lambda: popup.destroy()).pack()
+
+    def handle_cancel(self):
+        if self.main_program_next is not None:
+            self.main_program_next = None
+            self.program.enable()
+        if self.manual_program_active:
+            self.manual_program_active = False
+        self.device.send(k103.cancel_advances())
+
+    def handle_cancelled(self, device):
+        name = 'projector' if device == 'P' else 'camera'
+        self.latest_update.set(
+            'cancelled advances ({} was last active).'.format(name))
+        self.status_bar.end_program()
 
     def handle_connection_lost(self, exc):
         print 'connection lost!'

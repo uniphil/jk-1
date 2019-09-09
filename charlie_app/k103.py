@@ -39,5 +39,9 @@ def advance(device, n):
     ]) + Reel.pack_advance_number(n)
 
 
+def cancel_advances():
+    return bytearray([FRAME_CMD, 'x'])
+
+
 def dump(what):
     return bytearray(['_', what])

@@ -22,6 +22,7 @@ PORT - serial port for arduino (should auto-detect)
 def show_error(self, *args):
     err = traceback.format_exception(*args)
     tkMessageBox.showerror('Exception', err)
+    raise
 
 
 Tk.report_callback_exception = show_error
@@ -34,6 +35,7 @@ if __name__ == '__main__':
     except IndexError:
         maybes = list(list_ports.grep('usb'))
         if len(maybes) == 0:
+            tkMessageBox.showerror('Not connected', 'Cannot find USB device')
             sys.stderr.write(
                 'missing serial port (maybe /dev/tty.usbserial-something)\n')
             sys.exit(1)
