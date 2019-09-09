@@ -8,15 +8,20 @@ from .status_bar import StatusBar
 from .. import k103
 from ..reel import FRAME_CMD, REEL_CMD, Reel
 
+PACKET_USER_LOG = 0b11 << 6
+
 
 class App(ttk.Frame):
-    def __init__(self, device=None):
+    def __init__(self, device):
         t_init = time.time()
         ttk.Frame.__init__(self, None)
         self.device = device
         setattr(device, 'handle_packet', self.handle_packet)
+        self.original_alt_packet_handler = device.handle_alt_mode_packet
+        setattr(device, 'handle_alt_mode_packet', self.handle_alt_packet)
 
         self.master.title('Charlie control')
+        self.latest_update = tk.StringVar()
         self.camera_reel = None
         self.camera_current_frame = tk.IntVar()
         self.camera_current_frame.set(0)
@@ -67,8 +72,7 @@ class App(ttk.Frame):
             self.projector_reel, self.projector_current_frame,
             self.run_program)
 
-        # self.status_bar = StatusBar(
-        #     status_bar_frame, self.connect_serial)
+        self.status_bar = StatusBar(status_bar_frame, self.latest_update)
 
         self.camera_frame.grid(row=0, column=0)
         self.projector_frame.grid(row=0, column=1)
@@ -81,11 +85,11 @@ class App(ttk.Frame):
 
         self.program.grid()
 
-        d = ttk.Button(
-            self, text='Dump',
-            command=lambda: self.device.send(k103.dump('T')))
-        d.grid()
-        # self.status_bar.grid()
+        # ttk.Button(
+        #     self, text='Dump',
+        #     command=lambda: self.device.send(k103.dump('T'))).grid()
+
+        self.status_bar.grid()
 
     def handle_packet(self, bs):
         stuff = iter(bs)
@@ -124,6 +128,12 @@ class App(ttk.Frame):
         else:
             print 'woo got unrecognized packet:'
             print '\n'.join('  0x{0:02X}  {0:3d}  {0:c}'.format(b) for b in bs)
+
+    def handle_alt_packet(self, data, mode):
+        if mode == PACKET_USER_LOG:
+            self.latest_update.set(data)
+        else:
+            self.original_alt_packet_handler(data, mode)
 
     def handle_advance_frames(self, reel_id, n):
         print 'advancing', reel_id, n, 'frames'

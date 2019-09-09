@@ -1,26 +1,20 @@
-import Tkinter as tk
+import time
 import ttk
-from serial.tools import list_ports
 
 
 class StatusBar(ttk.Frame):
-    def __init__(self, master, connect):
+    def __init__(self, master, latest_update):
         ttk.Frame.__init__(self, master)
-        self.connect=connect
+        self.last_update_message = latest_update
+        self.last_update_time = time.time()
+        ttk.Label(self, textvariable=latest_update).pack()
+        self.last_update_message.trace('w', self.handle_log_update)
 
-        # maybes = list(list_ports.grep('usb'))
-        # if len(maybes) == 0:
-        #     sys.stderr.write(HELP.format(sys.argv[0]))
-        #     sys.stderr.write('\nError: missing serial port (probably /dev/tty.usbserial-something)\n')
-        #     sys.exit(1)
-        # if len(maybes) > 1:
-        #     sys.stderr.write('not sure which serial port to use. likely candidates:\n{}\n'.format(
-        #         '\n'.join(map(lambda m: '{}\t{}\t{}'.format(m.device, m.description, m.manufacturer), maybes))))
-        #     sys.exit(1)
-        # port = maybes[0].device
+    def handle_log_update(self, *args):
+        self.last_update_time = time.time()
+        self.after(3000, self.maybe_clear_update)
 
-        # s = Serial(port, 9600)
-
-        # time.sleep(1)
-        # t = s.read(s.in_waiting)
-        # print(t)
+    def maybe_clear_update(self, *args):
+        dt = time.time() - self.last_update_time
+        if dt > 2.8:
+            self.last_update_message.set('')
