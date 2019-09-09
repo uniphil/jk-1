@@ -19,6 +19,8 @@ class App(ttk.Frame):
         setattr(device, 'handle_packet', self.handle_packet)
         self.original_alt_packet_handler = device.handle_alt_mode_packet
         setattr(device, 'handle_alt_mode_packet', self.handle_alt_packet)
+        self.original_connection_lost = device.connection_lost
+        setattr(device, 'connection_lost', self.handle_connection_lost)
 
         self.master.title('Charlie control')
         self.latest_update = tk.StringVar()
@@ -149,6 +151,17 @@ class App(ttk.Frame):
         frame.pack(expand=True, ipadx=12, ipady=4)
         ttk.Label(frame, text=text).pack(ipady=12)
         ttk.Button(frame, text='Ok', command=lambda: popup.destroy()).pack()
+
+    def handle_connection_lost(self, exc):
+        print 'connection lost!'
+        popup = tk.Toplevel()
+        popup.title('device busy')
+        text = 'connection lost :('
+        frame = ttk.Frame(popup)
+        frame.pack(expand=True, ipadx=12, ipady=4)
+        ttk.Label(frame, text=text).pack(ipady=12)
+        ttk.Button(frame, text='Ok', command=lambda: popup.destroy()).pack()
+        self.original_connection_lost(exc)
 
     def handle_reel_update(self, reel_id, reel):
         assert reel_id in ('C', 'P')
