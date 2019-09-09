@@ -128,7 +128,8 @@ class ManualControlPopup(tk.Toplevel):
         self.frames_to_advance.set(1)
 
         self.reverse.trace('w', self.handle_set_frames)
-        self.current_frame.trace('w', self.handle_current_frame)
+        self.current_frame_trace_id = self.current_frame.trace_variable(
+            'w', self.handle_current_frame)
         self.bind('<Destroy>', self.handle_destroy)
         self.bind('<Escape>', lambda _: self.done())
 
@@ -187,6 +188,7 @@ class ManualControlPopup(tk.Toplevel):
             self.done()
 
     def done(self):
+        self.current_frame.trace_vdelete('w', self.current_frame_trace_id)
         self.close()
 
 
