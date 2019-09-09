@@ -21,6 +21,7 @@ class App(ttk.Frame):
         setattr(device, 'handle_alt_mode_packet', self.handle_alt_packet)
         self.original_connection_lost = device.connection_lost
         setattr(device, 'connection_lost', self.handle_connection_lost)
+        self.manual_program_active = False
 
         self.master.title('Charlie control')
         self.latest_update = tk.StringVar()
@@ -117,6 +118,11 @@ class App(ttk.Frame):
                 frame = Reel.frame_from_bytes(bytearray(stuff))
                 print 'frame update', reel_id, frame
                 self.handle_reel_frame_update(reel_id, frame)
+            elif cmd == ord('.'):
+                reel_id = chr(stuff.next())
+                frames = Reel.frame_from_bytes(bytearray(stuff))
+                print 'frame advance done', reel_id, frames
+                self.handle_advance_done(reel_id, frames)
             else:
                 raise NotImplementedError(
                     'frame command (0x{0:02X} {0:d} {0:c}) not working'.format(
@@ -134,9 +140,22 @@ class App(ttk.Frame):
         else:
             self.original_alt_packet_handler(data, mode)
 
+    def _advance_frames_progress(self, n):
+        self.status_bar.update_program_step(n)
+
+    def _advance_frames_done(self):
+        self.status_bar.end_program()
+        self.manual_program_active = False
+
     def handle_advance_frames(self, reel_id, n):
         print 'advancing', reel_id, n, 'frames'
+        self.status_bar.define_program(abs(n))
+        self.manual_program_active = True
         self.device.send(k103.advance(reel_id, n))
+
+    def handle_advance_done(self, reel_id, n):
+        if self.manual_program_active:
+            self._advance_frames_done()
 
     def handle_busy(self, device):
         print 'busy!', device
@@ -170,9 +189,13 @@ class App(ttk.Frame):
     def handle_reel_frame_update(self, reel_id, frame):
         assert reel_id in ('C', 'P')
         if reel_id == 'C':
+            diff = frame - self.camera_current_frame.get()
             self.camera_current_frame.set(frame)
         else:
+            diff = frame - self.projector_current_frame.get()
             self.projector_current_frame.set(frame)
+        if self.manual_program_active:
+            self._advance_frames_progress(abs(diff))
 
     def blah(self, x, y, z):
         print 'blah', x, y, z

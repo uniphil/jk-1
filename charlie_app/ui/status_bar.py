@@ -36,5 +36,8 @@ class StatusBar(ttk.Frame):
     def update_program(self, n_remaining):
         self.progress_bar.config(value=self.program_length - n_remaining + 1)
 
+    def update_program_step(self, by_n):
+        self.progress_bar.step(by_n)
+
     def end_program(self):
         self.progress_bar.config(value=0)
