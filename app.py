@@ -3,6 +3,9 @@
 from serial import Serial
 from serial.threaded import ReaderThread
 from serial.tools import list_ports
+from Tkinter import Tk
+import traceback
+import tkMessageBox
 from charlie_app import ui
 from packetizer import Packetizer
 
@@ -14,6 +17,14 @@ Usage: {} [PORT]
 
 PORT - serial port for arduino (should auto-detect)
 """
+
+
+def show_error(self, *args):
+    err = traceback.format_exception(*args)
+    tkMessageBox.showerror('Exception', err)
+
+
+Tk.report_callback_exception = show_error
 
 
 if __name__ == '__main__':
