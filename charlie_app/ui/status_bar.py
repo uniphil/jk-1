@@ -1,5 +1,8 @@
+import Tkinter as tk
 import time
 import ttk
+
+LOG_TTL = 5
 
 
 class StatusBar(ttk.Frame):
@@ -7,14 +10,31 @@ class StatusBar(ttk.Frame):
         ttk.Frame.__init__(self, master)
         self.last_update_message = latest_update
         self.last_update_time = time.time()
-        ttk.Label(self, textvariable=latest_update).pack()
+        self.program_length = 0
+
+        ttk.Label(self, textvariable=latest_update).grid(
+            row=0, column=1, sticky=tk.W)
         self.last_update_message.trace('w', self.handle_log_update)
+
+        self.progress_bar = ttk.Progressbar(
+            self, mode='determinate')
+        self.progress_bar.grid(row=0, column=0, padx=6)
 
     def handle_log_update(self, *args):
         self.last_update_time = time.time()
-        self.after(3000, self.maybe_clear_update)
+        self.after(LOG_TTL * 1000 + 200, self.maybe_clear_update)
 
     def maybe_clear_update(self, *args):
         dt = time.time() - self.last_update_time
-        if dt > 2.8:
+        if dt > LOG_TTL:
             self.last_update_message.set('')
+
+    def define_program(self, n):
+        self.program_length = n
+        self.progress_bar.config(maximum=n, value=0)
+
+    def update_program(self, n_remaining):
+        self.progress_bar.config(value=self.program_length - n_remaining + 1)
+
+    def end_program(self):
+        self.progress_bar.config(value=0)

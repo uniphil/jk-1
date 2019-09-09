@@ -61,7 +61,7 @@ class App(ttk.Frame):
         self.projector_frame = ttk.Frame(self)
         manual_frame = ttk.Frame(self)
         program_frame = ttk.Frame(self)
-        status_bar_frame = ttk.Frame(self)
+        self.status_bar = StatusBar(self, self.latest_update)
 
         camera_label = ttk.Label(self.camera_frame, text='Camera')
         self.camera_reel_widget = None
@@ -74,13 +74,10 @@ class App(ttk.Frame):
             self.projector_reel, self.projector_current_frame,
             self.run_program)
 
-        self.status_bar = StatusBar(status_bar_frame, self.latest_update)
-
         self.camera_frame.grid(row=0, column=0)
         self.projector_frame.grid(row=0, column=1)
         manual_frame.grid(row=1, column=0, columnspan=2)
         program_frame.grid(row=2, column=0, columnspan=2)
-        status_bar_frame.grid(row=3, column=0, columnspan=2)
 
         camera_label.grid(row=0, column=0)
         projector_label.grid(row=0, column=0)
@@ -91,7 +88,7 @@ class App(ttk.Frame):
         #     self, text='Dump',
         #     command=lambda: self.device.send(k103.dump('T'))).grid()
 
-        self.status_bar.grid()
+        self.status_bar.grid(columnspan=2, sticky=tk.E+tk.W)
 
     def handle_packet(self, bs):
         stuff = iter(bs)
@@ -210,28 +207,36 @@ class App(ttk.Frame):
         self.projector_reel.current_frame = new_frame
         self.replace_projector_reel(self.projector_reel)
 
-    def run_camera_program(self, n_cam, n_proj, remaining_program):
+    def _run_camera_program(self, n_cam, n_proj, remaining_program):
         def next_program_step():
             print '{} left'.format(len(remaining_program))
-            self.run_program(remaining_program)
+            self._run_program(remaining_program)
 
         def run_projector_program():
             print 'projector: {}'.format(n_proj)
             self.device.send(k103.advance('P', n_proj))
-            self.after(750 + 1400 * abs(n_proj), next_program_step)
+            self.after(1500 + 1300 * abs(n_proj), next_program_step)
 
         print 'camera: {}'.format(n_cam)
         self.device.send(k103.advance('C', n_cam))
-        self.after(1000 * abs(n_cam), run_projector_program)
+        self.after(100 + 900 * abs(n_cam), run_projector_program)
+
+    def _run_program(self, remaining_program):
+        self.status_bar.update_program(len(remaining_program))
+        try:
+            n_cam, n_proj = remaining_program.pop(0)
+        except IndexError:
+            print 'program done!'
+            self.status_bar.end_program()
+            self.program.enable()
+            return
+        self._run_camera_program(n_cam, n_proj, remaining_program)
 
     def run_program(self, program):
         print 'run program', program
-        try:
-            n_cam, n_proj = program.pop(0)
-        except IndexError:
-            print 'program done!'
-            return
-        self.run_camera_program(n_cam, n_proj, program)
+        self.status_bar.define_program(len(program))
+        self.program.disable()
+        return self._run_program(program)
 
     def update_camera_frame(self, *_):
         self.camera_reel.current_frame = self.camera_current_frame.get()

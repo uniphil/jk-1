@@ -44,7 +44,7 @@ class Program(ttk.Frame):
         camera_total_frames_label = ttk.Label(
             camera_frame, text='Camera frames:')
         camera_total_frames_entry = ttk.Entry(
-            camera_frame, textvariable=self.camera_total_frames, width=8)
+            camera_frame, textvariable=self.camera_total_frames, width=4)
         self.camera_frames_label = ttk.Label(camera_frame)
 
         camera_total_frames_entry.bind('<KeyRelease>', self.set_camera_frames)
@@ -53,19 +53,23 @@ class Program(ttk.Frame):
         camera_total_frames_entry.grid(row=0, column=1)
         self.camera_frames_label.grid(row=1, column=0, columnspan=2)
 
+        ratio_label = ttk.Label(rate_frame, text='Frame ratio:')
         faster_button = ttk.Button(
-            rate_frame, text='+', command=self.adjust_rate_faster)
+            rate_frame, text='←', command=self.adjust_rate_slower, width=1)
         self.rate_label = ttk.Label(rate_frame)
         slower_button = ttk.Button(
-            rate_frame, text='-', command=self.adjust_rate_slower)
-        faster_button.grid(row=0, column=0)
-        self.rate_label.grid(row=1, column=0)
-        slower_button.grid(row=2, column=0)
+            rate_frame, text='→', command=self.adjust_rate_faster, width=1)
+        self.frame_ratio_text = ttk.Label(rate_frame, text='asdf')
+        ratio_label.grid(row=0, column=0)
+        faster_button.grid(row=0, column=1)
+        self.rate_label.grid(row=0, column=2)
+        slower_button.grid(row=0, column=3)
+        self.frame_ratio_text.grid(row=1, column=0, columnspan=5)
 
         projector_total_frames_label = ttk.Label(
             projector_frame, text='Projector frames')
         projector_total_frames_entry = ttk.Entry(
-            projector_frame, textvariable=self.projector_total_frames, width=8)
+            projector_frame, textvariable=self.projector_total_frames, width=4)
         projector_reverse_option = ttk.Checkbutton(
             projector_frame, text='Reverse', variable=self.projector_reverse)
         self.projector_frames_label = ttk.Label(projector_frame)
@@ -79,16 +83,16 @@ class Program(ttk.Frame):
         projector_reverse_option.grid(row=0, column=2)
         self.projector_frames_label.grid(row=1, column=0, columnspan=3)
 
-        run_button = ttk.Button(
+        self.run_button = ttk.Button(
             self, text='Run program', command=self.run_program)
 
         title.grid(row=0, column=0, columnspan=3)
 
-        camera_frame.grid(row=1, column=0)
-        rate_frame.grid(row=1, column=1)
-        projector_frame.grid(row=1, column=2)
+        camera_frame.grid(row=1, column=0, padx=6)
+        rate_frame.grid(row=1, column=1, padx=24)
+        projector_frame.grid(row=1, column=2, padx=6)
 
-        run_button.grid(row=2, column=0, columnspan=3)
+        self.run_button.grid(row=2, column=0, columnspan=3)
 
         self.update_rate()
 
@@ -132,6 +136,12 @@ class Program(ttk.Frame):
         self.update_camera_frame_label()
         self.update_projector_frame_label()
 
+    def disable(self):
+        self.run_button.config(state=tk.DISABLED, text='Program running...')
+
+    def enable(self):
+        self.run_button.config(state=tk.NORMAL, text='Run program')
+
     def run_program(self):
         print 'go time'
         cam_frames = self.camera_total_frames.get()
@@ -146,11 +156,11 @@ class Program(ttk.Frame):
 
     def update_rate(self, *args):
         rate = self.rate_adjust.get()
-        if self.rate_inverse.get():
-            ratio = '{}:1'.format(rate)
-        else:
-            ratio = '1:{}'.format(rate)
+        cam, proj = (rate, 1) if self.rate_inverse.get() else (1, rate)
+        ratio = '{}:{}'.format(cam, proj)
+        ratio_text = 'Advance {} camera frames for every {} projector frames.'.format(cam, proj)
         self.rate_label.config(text=ratio)
+        self.frame_ratio_text.config(text=ratio_text)
         self.set_camera_frames()
         self.update_camera_frame_label()
         self.update_projector_frame_label()
