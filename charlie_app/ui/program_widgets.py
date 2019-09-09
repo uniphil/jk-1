@@ -158,7 +158,8 @@ class Program(ttk.Frame):
         rate = self.rate_adjust.get()
         cam, proj = (rate, 1) if self.rate_inverse.get() else (1, rate)
         ratio = '{}:{}'.format(cam, proj)
-        ratio_text = 'Advance {} camera frames for every {} projector frames.'.format(cam, proj)
+        ratio_text = 'Advance {} camera frames for every '\
+            '{} projector frames.'.format(cam, proj)
         self.rate_label.config(text=ratio)
         self.frame_ratio_text.config(text=ratio_text)
         self.set_camera_frames()

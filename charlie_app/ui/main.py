@@ -22,6 +22,7 @@ class App(ttk.Frame):
         self.original_connection_lost = device.connection_lost
         setattr(device, 'connection_lost', self.handle_connection_lost)
         self.manual_program_active = False
+        self.main_program_next = None
 
         self.master.title('Charlie control')
         self.latest_update = tk.StringVar()
@@ -148,13 +149,21 @@ class App(ttk.Frame):
         self.manual_program_active = False
 
     def handle_advance_frames(self, reel_id, n):
+        assert self.main_program_next is None
         print 'advancing', reel_id, n, 'frames'
         self.status_bar.define_program(abs(n))
         self.manual_program_active = True
         self.device.send(k103.advance(reel_id, n))
 
     def handle_advance_done(self, reel_id, n):
-        if self.manual_program_active:
+        main_active = self.main_program_next is not None
+        manual_active = self.manual_program_active
+        assert main_active or manual_active
+        assert not (main_active and manual_active),\
+            'main program or manual program can be active, not both!'
+        if main_active:
+            self.main_program_next()
+        else:
             self._advance_frames_done()
 
     def handle_busy(self, device):
@@ -238,11 +247,15 @@ class App(ttk.Frame):
         def run_projector_program():
             print 'projector: {}'.format(n_proj)
             self.device.send(k103.advance('P', n_proj))
-            self.after(1500 + 1300 * abs(n_proj), next_program_step)
+            self.main_program_next = next_program_step
+            # TODO: schedule a checkup
+            # self.after(1500 + 1300 * abs(n_proj), next_program_step)
 
         print 'camera: {}'.format(n_cam)
+        self.main_program_next = run_projector_program
         self.device.send(k103.advance('C', n_cam))
-        self.after(100 + 900 * abs(n_cam), run_projector_program)
+        # TODO: schedule a checkup
+        # self.after(100 + 900 * abs(n_cam), run_projector_program)
 
     def _run_program(self, remaining_program):
         self.status_bar.update_program(len(remaining_program))
@@ -250,12 +263,14 @@ class App(ttk.Frame):
             n_cam, n_proj = remaining_program.pop(0)
         except IndexError:
             print 'program done!'
+            self.main_program_next = None
             self.status_bar.end_program()
             self.program.enable()
             return
         self._run_camera_program(n_cam, n_proj, remaining_program)
 
     def run_program(self, program):
+        assert self.manual_program_active is False
         print 'run program', program
         self.status_bar.define_program(len(program))
         self.program.disable()
