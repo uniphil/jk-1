@@ -214,14 +214,17 @@ class ReelInfo(ttk.Frame):
         button_frame = ttk.Frame(self)
         manual_frame = ttk.Frame(self)
 
-        self.description = ttk.Label(info_frame)
+        self.reel_frame = ttk.Frame(info_frame)
+        self.description = ttk.Label(self.reel_frame)
         self.loaded_label = ttk.Label(info_frame)
-        self.film_frame = ttk.Label(info_frame)
+        self.frame_frame = ttk.Frame(info_frame)
+        self.frame_count_label = ttk.Label(self.frame_frame)
 
         self.frame_override_button = ttk.Button(
-            button_frame, text='Edit frame count', command=self.edit_count)
+            self.frame_frame, text='edit', command=self.edit_count)
+
         self.replace_button = ttk.Button(
-            button_frame, text='Replace reel', command=self.replace_reel)
+            self.reel_frame, text='Load new', command=self.replace_reel)
 
         self.manual_button = ttk.Button(
             manual_frame, text='Manual control', command=self.control_manually)
@@ -230,11 +233,15 @@ class ReelInfo(ttk.Frame):
         button_frame.grid(row=1, column=0, sticky=tk.W, padx=4, pady=3)
         manual_frame.grid(row=2, column=0, columnspan=2)
 
+        self.reel_frame.grid(row=0, column=0, sticky=tk.W)
         self.description.grid(row=0, column=0, sticky=tk.W)
-        self.loaded_label.grid(row=1, column=0, sticky=tk.W)
-        self.film_frame.grid(row=2, column=0, sticky=tk.W)
 
-        self.frame_override_button.grid(row=0, column=0)
+        self.loaded_label.grid(row=1, column=0, sticky=tk.W)
+
+        self.frame_frame.grid(row=2, column=0, sticky=tk.W)
+        self.frame_count_label.grid(row=0, column=0)
+        self.frame_override_button.grid(row=0, column=1)
+
         self.replace_button.grid(row=0, column=1)
 
         self.manual_button.grid()
@@ -295,6 +302,6 @@ class ReelInfo(ttk.Frame):
         self.description.config(text='Reel: {}'.format(reel.description))
         self.loaded_label.config(
             text='Loaded: {}'.format(time.ctime(reel.loaded_at)))
-        self.film_frame.config(text='Frame: {} of {} ({:.1%})'.format(
+        self.frame_count_label.config(text='Frame: {} of {} ({:.1%})'.format(
             self.current_frame.get(), reel.total_frames,
             self.current_frame.get() / float(reel.total_frames)))
