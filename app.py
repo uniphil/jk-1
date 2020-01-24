@@ -4,9 +4,10 @@ from serial import Serial
 from serial.threaded import ReaderThread
 from serial.tools import list_ports
 from Tkinter import Tk
+import time
 import traceback
 import tkMessageBox
-from charlie_app import ui
+from charlie_app import ui, k103
 from packetizer import Packetizer
 
 
@@ -30,8 +31,14 @@ Tk.report_callback_exception = show_error
 
 if __name__ == '__main__':
     import sys
+    init = False
     try:
         port = sys.argv[1]
+        if port == 'init':
+            print 'init!'
+            init = True
+            sys.argv.pop(1)
+            port = sys.argv[1]
     except IndexError:
         maybes = list(list_ports.grep('usb'))
         if len(maybes) == 0:
@@ -51,6 +58,12 @@ if __name__ == '__main__':
     s = Serial(port, 9600)
 
     with ReaderThread(s, Packetizer) as device:
+        if init:
+            time.sleep(2)
+            device.send(k103.init('C'))
+            time.sleep(0.2)
+            device.send(k103.init('P'))
+            time.sleep(0.2)
         app = ui.App(device=device)
         app.master.lift()  # dunno why this helps with first render
         app.mainloop()

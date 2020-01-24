@@ -185,10 +185,10 @@ class ManualControlPopup(tk.Toplevel):
 
     def handle_destroy(self, event):
         if event.widget is self:
+            self.current_frame.trace_vdelete('w', self.current_frame_trace_id)
             self.done()
 
     def done(self):
-        self.current_frame.trace_vdelete('w', self.current_frame_trace_id)
         self.close()
 
 
