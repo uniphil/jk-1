@@ -24,6 +24,9 @@ class App(tk.Frame):
         self.manual_program_active = False
         self.main_program_next = None
 
+        self.exiting = False
+        self.bind('<Destroy>', self.handle_destroy)
+
         self.master.title('Charlie control')
         self.latest_update = tk.StringVar()
         self.camera_reel = None
@@ -57,6 +60,9 @@ class App(tk.Frame):
             self.projector_current_frame, self.replace_projector_reel,
             self.override_projector_frame, self.handle_advance_frames)
         self.projector_reel_widget.grid(row=1, column=0)
+
+    def handle_destroy(self, e):
+        self.exiting = True
 
     def create_widgets(self):
         self.camera_frame = tk.Frame(self)
@@ -205,9 +211,11 @@ class App(tk.Frame):
         self.status_bar.end_program()
 
     def handle_connection_lost(self, exc):
+        if self.exiting:
+            return
         print 'connection lost!'
         popup = tk.Toplevel()
-        popup.title('device busy')
+        popup.title('Connection lost')
         text = 'connection lost :('
         frame = tk.Frame(popup)
         frame.pack(expand=True, ipadx=12, ipady=4)
