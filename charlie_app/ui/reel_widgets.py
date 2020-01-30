@@ -231,8 +231,9 @@ class ReelInfo(tk.Frame):
             self.frame_frame,
             font=tkFont.Font(size=24, weight='bold'))
 
-        self.frame_override_button = tk.Button(
-            self.frame_frame, text='edit', command=self.edit_count)
+        self.frame_override_button = tk.Label(
+            self.frame_frame, text='edit', foreground='blue')
+        self.frame_override_button.bind('<Button-1>', self.edit_count)
 
         self.replace_button = tk.Button(
             self.reel_frame, text='Load new', command=self.replace_reel)
@@ -264,7 +265,7 @@ class ReelInfo(tk.Frame):
         else:
             self.advance_frames('P', n)
 
-    def edit_count(self):
+    def edit_count(self, *_):
         if self.frame_override_popup is not None:
             return
         self.frame_override_popup = OverrideFramePopup(
