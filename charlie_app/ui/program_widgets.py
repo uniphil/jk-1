@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 import Tkinter as tk
-import ttk
 
 
-class Program(ttk.Frame):
+class Program(tk.Frame):
     def __init__(
         self, master, camera_reel, camera_current_frame,
         projector_reel, projector_current_frame, on_run,
     ):
-        ttk.Frame.__init__(self, master)
+        tk.Frame.__init__(self, master)
         self.camera_reel = camera_reel
         self.camera_current_frame = camera_current_frame
         self.projector_reel = projector_reel
@@ -35,17 +34,17 @@ class Program(ttk.Frame):
         self.config(
             relief='groove',
             borderwidth=2)
-        title = ttk.Label(self, text='Printing program')
+        title = tk.Label(self, text='Printing program')
 
-        camera_frame = ttk.Frame(self)
-        rate_frame = ttk.Frame(self)
-        projector_frame = ttk.Frame(self)
+        camera_frame = tk.Frame(self)
+        rate_frame = tk.Frame(self)
+        projector_frame = tk.Frame(self)
 
-        camera_total_frames_label = ttk.Label(
+        camera_total_frames_label = tk.Label(
             camera_frame, text='Camera frames:')
-        camera_total_frames_entry = ttk.Entry(
+        camera_total_frames_entry = tk.Entry(
             camera_frame, textvariable=self.camera_total_frames, width=4)
-        self.camera_frames_label = ttk.Label(camera_frame)
+        self.camera_frames_label = tk.Label(camera_frame)
 
         camera_total_frames_entry.bind('<KeyRelease>', self.set_camera_frames)
         camera_total_frames_entry.bind('<FocusOut>', self.set_camera_frames)
@@ -53,30 +52,30 @@ class Program(ttk.Frame):
         camera_total_frames_entry.grid(row=0, column=1)
         self.camera_frames_label.grid(row=1, column=0, columnspan=2)
 
-        ratio_label = ttk.Label(rate_frame, text='Frame ratio:')
-        faster_button = ttk.Button(
+        ratio_label = tk.Label(rate_frame, text='Frame ratio:')
+        faster_button = tk.Button(
             rate_frame, text='←', command=self.adjust_rate_slower, width=1)
-        self.rate_label = ttk.Label(rate_frame)
-        slower_button = ttk.Button(
+        self.rate_label = tk.Label(rate_frame)
+        slower_button = tk.Button(
             rate_frame, text='→', command=self.adjust_rate_faster, width=1)
-        self.frame_ratio_text = ttk.Label(rate_frame, text='asdf')
+        self.frame_ratio_text = tk.Label(rate_frame, text='asdf')
         ratio_label.grid(row=0, column=0)
         faster_button.grid(row=0, column=1)
         self.rate_label.grid(row=0, column=2)
         slower_button.grid(row=0, column=3)
         self.frame_ratio_text.grid(row=1, column=0, columnspan=5)
 
-        projector_total_frames_label = ttk.Label(
+        projector_total_frames_label = tk.Label(
             projector_frame, text='Projector frames')
-        projector_reverse_option = ttk.Checkbutton(
+        projector_reverse_option = tk.Checkbutton(
             projector_frame, text='Reverse', variable=self.projector_reverse)
-        self.projector_frames_label = ttk.Label(projector_frame)
+        self.projector_frames_label = tk.Label(projector_frame)
 
         projector_total_frames_label.grid(row=0, column=0)
         projector_reverse_option.grid(row=0, column=2)
         self.projector_frames_label.grid(row=1, column=0, columnspan=3)
 
-        self.run_button = ttk.Button(
+        self.run_button = tk.Button(
             self, text='Run program', command=self.run_program)
 
         title.grid(row=0, column=0, columnspan=3)

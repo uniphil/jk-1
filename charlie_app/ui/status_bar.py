@@ -1,26 +1,26 @@
 import Tkinter as tk
 import time
-import ttk
 
 LOG_TTL = 5
 
 
-class StatusBar(ttk.Frame):
+class StatusBar(tk.Frame):
     def __init__(self, master, latest_update, on_cancel):
-        ttk.Frame.__init__(self, master)
+        tk.Frame.__init__(self, master)
         self.last_update_message = latest_update
         self.cancel = on_cancel
         self.last_update_time = time.time()
         self.program_length = 0
 
-        self.progress_bar = ttk.Progressbar(
-            self, mode='determinate')
-        self.progress_bar.grid(row=0, column=0, padx=6)
+        # FIXME
+        # self.progress_bar = tk.Progressbar(
+        #     self, mode='determinate')
+        # self.progress_bar.grid(row=0, column=0, padx=6)
 
-        self.cancel_button = ttk.Button(
+        self.cancel_button = tk.Button(
             self, text='Cancel', command=self.cancel)
 
-        ttk.Label(self, textvariable=latest_update).grid(
+        tk.Label(self, textvariable=latest_update).grid(
             row=0, column=2, sticky=tk.W)
         self.last_update_message.trace('w', self.handle_log_update)
 
@@ -35,15 +35,17 @@ class StatusBar(ttk.Frame):
 
     def define_program(self, n):
         self.program_length = n
-        self.progress_bar.config(maximum=n, value=0)
+        # self.progress_bar.config(maximum=n, value=0)  # FIXME
         self.cancel_button.grid(row=0, column=1)
 
     def update_program(self, n_remaining):
-        self.progress_bar.config(value=self.program_length - n_remaining + 1)
+        # self.progress_bar.config(value=self.program_length - n_remaining + 1)
+        pass  # FIXME
 
     def update_program_step(self, by_n):
-        self.progress_bar.step(by_n)
+        # self.progress_bar.step(by_n)
+        pass  # FIXME
 
     def end_program(self):
-        self.progress_bar.config(value=0)
+        # self.progress_bar.config(value=0)
         self.cancel_button.grid_forget()

@@ -2,7 +2,6 @@ import Tkinter as tk
 from datetime import date
 import time
 import tkFont
-import ttk
 
 from ..reel import Reel
 
@@ -15,34 +14,34 @@ class ReplaceReelPopup(tk.Toplevel):
         self.bind('<Destroy>', self.handle_destroy)
         self.bind('<Escape>', lambda _: self.cancel())
 
-        frame = ttk.Frame(self)
+        frame = tk.Frame(self)
         frame.pack(fill='both')
 
-        title_label = ttk.Label(frame, text='New {} reel'.format(device))
+        title_label = tk.Label(frame, text='New {} reel'.format(device))
         title_label.grid(column=1, row=0)
 
-        description_label = ttk.Label(frame, text='Description')
+        description_label = tk.Label(frame, text='Description')
         description_label.grid(column=0, row=1, sticky=tk.E)
-        self.description = ttk.Entry(frame)
+        self.description = tk.Entry(frame)
         self.description.grid(column=1, row=1)
         self.description.focus()
 
-        total_frames_label = ttk.Label(frame, text='Total frames')
+        total_frames_label = tk.Label(frame, text='Total frames')
         total_frames_label.grid(column=0, row=2, sticky=tk.E)
-        self.total_frames = ttk.Entry(frame)
+        self.total_frames = tk.Entry(frame)
         self.total_frames.grid(column=1, row=2)
 
-        current_frame_label = ttk.Label(frame, text='Initial frame')
+        current_frame_label = tk.Label(frame, text='Initial frame')
         current_frame_label.grid(column=0, row=3, sticky=tk.E)
 
-        self.current_frame = ttk.Entry(frame)
+        self.current_frame = tk.Entry(frame)
         self.current_frame.grid(column=1, row=3)
 
-        buttons = ttk.Frame(frame)
+        buttons = tk.Frame(frame)
         buttons.grid(column=0, columnspan=2, row=4)
-        cancel = ttk.Button(buttons, text='Cancel', command=self.cancel)
+        cancel = tk.Button(buttons, text='Cancel', command=self.cancel)
         cancel.pack(side='left')
-        save = ttk.Button(buttons, text='Save', command=self.save)
+        save = tk.Button(buttons, text='Save', command=self.save)
         save.pack(side='right')
 
     def handle_destroy(self, event):
@@ -73,25 +72,25 @@ class OverrideFramePopup(tk.Toplevel):
         self.bind('<Destroy>', self.handle_destroy)
         self.bind('<Escape>', lambda _: self.cancel())
 
-        frame = ttk.Frame(self)
+        frame = tk.Frame(self)
         frame.pack(fill='both')
 
-        label = ttk.Label(frame, text='Current frame:')
+        label = tk.Label(frame, text='Current frame:')
         label.grid(column=0, row=0, sticky=tk.E)
 
-        minus = ttk.Button(frame, text='-', command=self.minus_one, width=1)
+        minus = tk.Button(frame, text='-', command=self.minus_one, width=1)
         minus.grid(column=1, row=0)
-        self.frame_entry = ttk.Entry(
+        self.frame_entry = tk.Entry(
             frame, textvariable=self.new_current_frame, width=5)
         self.frame_entry.grid(column=2, row=0)
-        plus = ttk.Button(frame, text='+', command=self.plus_one, width=1)
+        plus = tk.Button(frame, text='+', command=self.plus_one, width=1)
         plus.grid(column=3, row=0)
 
-        buttons = ttk.Frame(frame)
+        buttons = tk.Frame(frame)
         buttons.grid(column=0, columnspan=4, row=1)
-        cancel = ttk.Button(buttons, text='Cancel', command=self.cancel)
+        cancel = tk.Button(buttons, text='Cancel', command=self.cancel)
         cancel.pack(side='left')
-        save = ttk.Button(buttons, text='Save', command=self.save)
+        save = tk.Button(buttons, text='Save', command=self.save)
         save.pack(side='right')
 
         self.frame_entry.focus()
@@ -135,33 +134,33 @@ class ManualControlPopup(tk.Toplevel):
         self.bind('<Destroy>', self.handle_destroy)
         self.bind('<Escape>', lambda _: self.done())
 
-        frame = ttk.Frame(self)
+        frame = tk.Frame(self)
         frame.pack(fill='both')
 
-        self.current_frame_label = ttk.Label(
+        self.current_frame_label = tk.Label(
             frame, text='Current frame: {}'.format(self.current_frame.get()))
         self.current_frame_label.grid(column=0, row=0, sticky=tk.E)
 
-        reverse_option = ttk.Checkbutton(
+        reverse_option = tk.Checkbutton(
             frame, text='Reverse', variable=self.reverse)
         reverse_option.grid(column=1, row=0)
 
-        frame_num_entry = ttk.Entry(
+        frame_num_entry = tk.Entry(
             frame, textvariable=self.frames_to_advance, width=8)
         frame_num_entry.bind('<KeyRelease>', self.handle_set_frames)
         frame_num_entry.bind('<FocusOut>', self.handle_set_frames)
         frame_num_entry.grid(column=0, row=1)
 
-        self.advance_button = ttk.Button(
+        self.advance_button = tk.Button(
             frame,
             text='Advance {} frames'.format(self.frames_to_advance.get()),
             command=self.handle_advance)
         self.advance_button.grid(column=0, columnspan=2, row=2)
 
-        buttons = ttk.Frame(frame)
+        buttons = tk.Frame(frame)
         buttons.grid(column=0, columnspan=4, row=4)
 
-        done = ttk.Button(buttons, text='Done', command=self.done)
+        done = tk.Button(buttons, text='Done', command=self.done)
         done.pack(side='bottom')
 
     def get_frames(self):
@@ -194,12 +193,12 @@ class ManualControlPopup(tk.Toplevel):
         self.close()
 
 
-class ReelInfo(ttk.Frame):
+class ReelInfo(tk.Frame):
     def __init__(
         self, master, device, reel, current_frame, update_reel,
         update_current_frame, advance_frames,
     ):
-        ttk.Frame.__init__(
+        tk.Frame.__init__(
             self, master,
             relief='groove',
             borderwidth=2)
@@ -215,30 +214,30 @@ class ReelInfo(ttk.Frame):
         self.update(reel)
 
     def create_widgets(self):
-        info_frame = ttk.Frame(self)
-        button_frame = ttk.Frame(self)
-        manual_frame = ttk.Frame(self)
+        info_frame = tk.Frame(self)
+        button_frame = tk.Frame(self)
+        manual_frame = tk.Frame(self)
 
-        self.reel_frame = ttk.Frame(info_frame)
-        self.description = ttk.Label(self.reel_frame)
-        self.loaded_label = ttk.Label(
+        self.reel_frame = tk.Frame(info_frame)
+        self.description = tk.Label(self.reel_frame)
+        self.loaded_label = tk.Label(
             info_frame,
             font=tkFont.Font(size=12, slant='italic'),
             foreground='#777')
-        self.frame_frame = ttk.Frame(info_frame)
-        self.frame_count_label = ttk.Label(
+        self.frame_frame = tk.Frame(info_frame)
+        self.frame_count_label = tk.Label(
             self.frame_frame, text='Current frame:')
-        self.current_frame_number = ttk.Label(
+        self.current_frame_number = tk.Label(
             self.frame_frame,
             font=tkFont.Font(size=24, weight='bold'))
 
-        self.frame_override_button = ttk.Button(
+        self.frame_override_button = tk.Button(
             self.frame_frame, text='edit', command=self.edit_count)
 
-        self.replace_button = ttk.Button(
+        self.replace_button = tk.Button(
             self.reel_frame, text='Load new', command=self.replace_reel)
 
-        self.manual_button = ttk.Button(
+        self.manual_button = tk.Button(
             manual_frame, text='Manual control', command=self.control_manually)
 
         info_frame.grid(row=0, column=0, sticky=tk.W, padx=8, pady=6)
@@ -314,6 +313,6 @@ class ReelInfo(ttk.Frame):
     def update(self, reel):
         self.description.config(text='Current reel: {}'.format(
             reel.description))
-        self.loaded_label.config(text='last reset {:%b %d, %Y}'.format(
+        self.loaded_label.config(text='loaded {:%b %d, %Y}'.format(
             date.fromtimestamp(reel.loaded_at)))
         self.current_frame_number.config(text=self.current_frame.get())

@@ -1,7 +1,6 @@
 import time
 import Tkinter as tk
 import tkFont
-import ttk
 
 from .reel_widgets import ReelInfo
 from .program_widgets import Program
@@ -12,10 +11,10 @@ from ..reel import FRAME_CMD, REEL_CMD, Reel
 PACKET_USER_LOG = 0b11 << 6
 
 
-class App(ttk.Frame):
+class App(tk.Frame):
     def __init__(self, device):
         t_init = time.time()
-        ttk.Frame.__init__(self, None)
+        tk.Frame.__init__(self, None)
         self.device = device
         setattr(device, 'handle_packet', self.handle_packet)
         self.original_alt_packet_handler = device.handle_alt_mode_packet
@@ -60,20 +59,20 @@ class App(ttk.Frame):
         self.projector_reel_widget.grid(row=1, column=0)
 
     def create_widgets(self):
-        self.camera_frame = ttk.Frame(self)
-        self.projector_frame = ttk.Frame(self)
-        manual_frame = ttk.Frame(self)
-        program_frame = ttk.Frame(self)
+        self.camera_frame = tk.Frame(self)
+        self.projector_frame = tk.Frame(self)
+        manual_frame = tk.Frame(self)
+        program_frame = tk.Frame(self)
         self.status_bar = StatusBar(
             self, self.latest_update, self.handle_cancel)
 
-        camera_label = ttk.Label(
+        camera_label = tk.Label(
             self.camera_frame,
             text='Camera',
             font=tkFont.Font(size=20))
         self.camera_reel_widget = None
 
-        projector_label = ttk.Label(
+        projector_label = tk.Label(
             self.projector_frame,
             text='Projector',
             font=tkFont.Font(size=20))
@@ -94,7 +93,7 @@ class App(ttk.Frame):
 
         self.program.grid()
 
-        # ttk.Button(
+        # tk.Button(
         #     self, text='Dump',
         #     command=lambda: self.device.send(k103.dump('T'))).grid()
 
@@ -186,10 +185,10 @@ class App(ttk.Frame):
         popup.title('device busy')
         name = 'projector' if device == 'P' else 'camera'
         text = '{} seems to be busy, try again in a moment?'.format(name)
-        frame = ttk.Frame(popup)
+        frame = tk.Frame(popup)
         frame.pack(expand=True, ipadx=12, ipady=4)
-        ttk.Label(frame, text=text).pack(ipady=12)
-        ttk.Button(frame, text='Ok', command=lambda: popup.destroy()).pack()
+        tk.Label(frame, text=text).pack(ipady=12)
+        tk.Button(frame, text='Ok', command=lambda: popup.destroy()).pack()
 
     def handle_cancel(self):
         if self.main_program_next is not None:
@@ -210,10 +209,10 @@ class App(ttk.Frame):
         popup = tk.Toplevel()
         popup.title('device busy')
         text = 'connection lost :('
-        frame = ttk.Frame(popup)
+        frame = tk.Frame(popup)
         frame.pack(expand=True, ipadx=12, ipady=4)
-        ttk.Label(frame, text=text).pack(ipady=12)
-        ttk.Button(frame, text='Ok', command=lambda: popup.destroy()).pack()
+        tk.Label(frame, text=text).pack(ipady=12)
+        tk.Button(frame, text='Ok', command=lambda: popup.destroy()).pack()
         self.original_connection_lost(exc)
 
     def handle_reel_update(self, reel_id, reel):
