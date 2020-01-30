@@ -75,15 +75,19 @@ class App(tk.Frame):
         camera_label = tk.Label(
             self.camera_frame,
             text='Camera',
-            font=tkFont.Font(size=20))
+            font=tkFont.Font(size=20),
+            pady=10)
         self.camera_reel_widget = None
 
         projector_label = tk.Label(
             self.projector_frame,
             text='Projector',
-            font=tkFont.Font(size=20))
+            font=tkFont.Font(size=20),
+            pady=10)
         self.projector_reel_widget = None
 
+        program_label = tk.Label(
+            program_frame, text='Program', font=tkFont.Font(size=20), pady=10)
         self.program = Program(
             program_frame, self.camera_reel, self.camera_current_frame,
             self.projector_reel, self.projector_current_frame,
@@ -97,7 +101,8 @@ class App(tk.Frame):
         camera_label.grid(row=0, column=0)
         projector_label.grid(row=0, column=0)
 
-        self.program.grid()
+        program_label.grid(row=0, column=0)
+        self.program.grid(row=1, column=0)
 
         # tk.Button(
         #     self, text='Dump',

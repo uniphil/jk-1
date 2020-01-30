@@ -121,7 +121,8 @@ class ReelInfo(tk.Frame):
         tk.Frame.__init__(
             self, master,
             relief='groove',
-            borderwidth=2)
+            borderwidth=2,
+            padx=8)
         self.device = device
         self.current_frame = current_frame
         self.update_reel = update_reel
@@ -134,57 +135,59 @@ class ReelInfo(tk.Frame):
         self.update(reel)
 
     def create_widgets(self):
-        info_frame = tk.Frame(self)
-        button_frame = tk.Frame(self)
+        big_font = tkFont.Font(size=48, weight='bold')
+
+        frame_frame = tk.Frame(self)
         manual_frame = tk.Frame(self)
+        reel_frame = tk.Frame(self)
 
-        self.reel_frame = tk.Frame(info_frame)
-        self.description = tk.Label(self.reel_frame)
-        self.loaded_label = tk.Label(
-            info_frame,
-            font=tkFont.Font(size=12, slant='italic'),
-            foreground='#777')
-        self.frame_frame = tk.Frame(info_frame)
         self.frame_count_label = tk.Label(
-            self.frame_frame, text='Current frame:')
-        self.current_frame_number = tk.Label(
-            self.frame_frame,
-            font=tkFont.Font(size=24, weight='bold'))
-
+            frame_frame, text='Current frame')
         self.frame_override_button = tk.Label(
-            self.frame_frame, text='edit', foreground='blue')
+            frame_frame,
+            text='override',
+            foreground='#77C',
+            cursor='pencil',
+            font=tkFont.Font(size=12))
         self.frame_override_button.bind('<Button-1>', self.edit_count)
+        self.current_frame_number = tk.Label(
+            frame_frame,
+            font=big_font,
+            padx=12)
 
-        self.replace_button = tk.Button(
-            self.reel_frame, text='Load new', command=self.replace_reel)
-
-        self.manual_label = tk.Label(manual_frame, text='Manual step')
+        self.manual_label = tk.Label(
+            manual_frame, text='Step',
+            font=tkFont.Font(weight='bold'))
         self.manual_bw = tk.Button(
-            manual_frame, text='Reverse',
+            manual_frame, text='Backward',
             command=lambda: self.handle_advance(-1))
         self.manual_fw = tk.Button(
             manual_frame, text='Forward',
             command=lambda: self.handle_advance(1))
 
-        info_frame.grid(row=0, column=0, sticky=tk.W, padx=8, pady=6)
-        button_frame.grid(row=1, column=0, sticky=tk.W, padx=4, pady=3)
-        manual_frame.grid(row=2, column=0, columnspan=2)
+        self.loaded_label = tk.Label(
+            reel_frame,
+            font=tkFont.Font(size=12, slant='italic'),
+            foreground='#777')
+        self.replace_button = tk.Button(
+            reel_frame, text='New reel',
+            command=self.replace_reel)
 
-        self.reel_frame.grid(row=0, column=0, sticky=tk.W)
-        self.description.grid(row=0, column=0, sticky=tk.W)
+        frame_frame.grid(row=0, column=0, pady=4)
+        self.frame_count_label.grid(
+            row=0, column=0, ipady=0, pady=0, sticky=tk.E+tk.S)
+        self.frame_override_button.grid(
+            row=1, column=0, ipady=0, pady=0, sticky=tk.E+tk.N)
+        self.current_frame_number.grid(row=0, column=1, rowspan=2)
 
-        self.loaded_label.grid(row=1, column=0, sticky=tk.W)
-
-        self.frame_frame.grid(row=2, column=0, sticky=tk.W)
-        self.frame_count_label.grid(row=0, column=0)
-        self.current_frame_number.grid(row=1, column=0, columnspan=2)
-        self.frame_override_button.grid(row=0, column=1)
-
-        self.replace_button.grid(row=0, column=1)
-
+        manual_frame.grid(row=1, column=0, pady=4)
         self.manual_label.grid(row=0, column=0)
         self.manual_bw.grid(row=0, column=1)
         self.manual_fw.grid(row=0, column=2)
+
+        reel_frame.grid(row=2, column=0, pady=4)
+        self.loaded_label.grid(row=0, column=0)
+        self.replace_button.grid(row=0, column=1)
 
     def handle_advance(self, n):
         if (self.device == 'camera'):
@@ -225,8 +228,7 @@ class ReelInfo(tk.Frame):
         self.replace_button.config(state=tk.NORMAL)
 
     def update(self, reel):
-        self.description.config(text='Current reel: {}'.format(
-            reel.description))
-        self.loaded_label.config(text='loaded {:%b %d, %Y}'.format(
+        # self.description.config(text=reel.description)
+        self.loaded_label.config(text='Loaded {:%b %d}'.format(
             date.fromtimestamp(reel.loaded_at)))
         self.current_frame_number.config(text=self.current_frame.get())
