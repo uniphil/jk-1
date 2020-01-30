@@ -34,8 +34,8 @@ class ReplaceReelPopup(tk.Toplevel):
         current_frame_label = tk.Label(frame, text='Initial frame')
         current_frame_label.grid(column=0, row=3, sticky=tk.E)
 
-        self.current_frame = tk.Entry(frame)
-        self.current_frame.grid(column=1, row=3)
+        self.initial_frame = tk.Entry(frame)
+        self.initial_frame.grid(column=1, row=3)
 
         buttons = tk.Frame(frame)
         buttons.grid(column=0, columnspan=2, row=4)
@@ -49,15 +49,15 @@ class ReplaceReelPopup(tk.Toplevel):
             self.cancel()
 
     def cancel(self):
-        self.close(None)
+        self.close()
 
     def save(self):
         now = int(time.time())
         description = self.description.get()
-        total_frames = int(self.total_frames.get())
-        current_frame = int(self.current_frame.get())
-        new_reel = Reel(now, description, total_frames, current_frame)
-        self.close(new_reel)
+        total_frames = int(self.total_frames.get() or '1')
+        initial_frame = int(self.initial_frame.get() or '0')
+        new_reel = Reel(now, description, total_frames, 0)
+        self.close(new_reel, initial_frame)
 
 
 class OverrideFramePopup(tk.Toplevel):
@@ -287,9 +287,11 @@ class ReelInfo(tk.Frame):
         self.reel_popup.transient(self)
         self.replace_button.config(state=tk.DISABLED)
 
-    def close_replace_popup(self, reel):
+    def close_replace_popup(self, reel=None, initial_frame=None):
         if reel is not None:
             self.update_reel(reel)
+            if initial_frame is not None:
+                self.handle_advance(initial_frame)
         self.reel_popup.destroy()
         self.reel_popup = None
         self.replace_button.config(state=tk.NORMAL)
