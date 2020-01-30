@@ -14,7 +14,7 @@ PACKET_USER_LOG = 0b11 << 6
 class App(tk.Frame):
     def __init__(self, device):
         t_init = time.time()
-        tk.Frame.__init__(self, None)
+        tk.Frame.__init__(self, None, padx=12, pady=0)
         self.device = device
         setattr(device, 'handle_packet', self.handle_packet)
         self.original_alt_packet_handler = device.handle_alt_mode_packet
@@ -27,7 +27,7 @@ class App(tk.Frame):
         self.exiting = False
         self.bind('<Destroy>', self.handle_destroy)
 
-        self.master.title('Charlie control')
+        self.master.title('JK-1 control')
         self.latest_update = tk.StringVar()
         self.camera_reel = None
         self.camera_current_frame = tk.IntVar()
@@ -37,8 +37,8 @@ class App(tk.Frame):
         self.projector_current_frame = tk.IntVar()
         self.projector_current_frame.set(0)
         self.projector_current_frame.trace('w', self.update_projector_frame)
+        self.grid(sticky=tk.N+tk.S+tk.E+tk.W)
         self.create_widgets()
-        self.grid()
 
         dt = time.time() - t_init
         time.sleep(max(0, 2 - dt))
@@ -65,9 +65,14 @@ class App(tk.Frame):
         self.exiting = True
 
     def create_widgets(self):
+        top = self.winfo_toplevel()
+        top.rowconfigure(0, weight=1)
+        top.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+
         self.camera_frame = tk.Frame(self)
         self.projector_frame = tk.Frame(self)
-        manual_frame = tk.Frame(self)
         program_frame = tk.Frame(self)
         self.status_bar = StatusBar(
             self, self.latest_update, self.handle_cancel)
@@ -93,10 +98,9 @@ class App(tk.Frame):
             self.projector_reel, self.projector_current_frame,
             self.run_program)
 
-        self.camera_frame.grid(row=0, column=0)
-        self.projector_frame.grid(row=0, column=1)
-        manual_frame.grid(row=1, column=0, columnspan=2)
-        program_frame.grid(row=2, column=0, columnspan=2)
+        self.camera_frame.grid(row=0, column=0, sticky=tk.E+tk.W)
+        self.projector_frame.grid(row=0, column=1, sticky=tk.E+tk.W)
+        program_frame.grid(row=1, column=0, columnspan=2)
 
         camera_label.grid(row=0, column=0)
         projector_label.grid(row=0, column=0)
@@ -108,7 +112,7 @@ class App(tk.Frame):
         #     self, text='Dump',
         #     command=lambda: self.device.send(k103.dump('T'))).grid()
 
-        self.status_bar.grid(columnspan=2, sticky=tk.E+tk.W)
+        self.status_bar.grid(row=2, column=0, columnspan=2, sticky=tk.E+tk.W)
 
     def handle_packet(self, bs):
         stuff = iter(bs)
