@@ -14,34 +14,29 @@ class ReplaceReelPopup(tk.Toplevel):
         self.bind('<Destroy>', self.handle_destroy)
         self.bind('<Escape>', lambda _: self.cancel())
 
-        frame = tk.Frame(self)
+        frame = tk.Frame(self, padx=8, pady=4)
         frame.pack(fill='both')
 
-        title_label = tk.Label(frame, text='New {} reel'.format(device))
-        title_label.grid(column=1, row=0)
+        title_label = tk.Label(
+            frame, text='New {} reel'.format(device),
+            font=tkFont.Font(size=20),
+            pady=10)
+        title_label.grid(column=0, row=0, columnspan=2)
 
-        description_label = tk.Label(frame, text='Description')
-        description_label.grid(column=0, row=1, sticky=tk.E)
-        self.description = tk.Entry(frame)
-        self.description.grid(column=1, row=1)
-        self.description.focus()
+        initial_frame_label = tk.Label(frame, text='Initial frame:', pady=8)
+        initial_frame_label.grid(column=0, row=3, sticky=tk.E)
 
-        total_frames_label = tk.Label(frame, text='Total frames')
-        total_frames_label.grid(column=0, row=2, sticky=tk.E)
-        self.total_frames = tk.Entry(frame)
-        self.total_frames.grid(column=1, row=2)
-
-        current_frame_label = tk.Label(frame, text='Initial frame')
-        current_frame_label.grid(column=0, row=3, sticky=tk.E)
-
-        self.initial_frame = tk.Entry(frame)
+        self.initial_frame = tk.Entry(frame, width=3)
+        self.initial_frame.insert(0, '0')
         self.initial_frame.grid(column=1, row=3)
+        self.initial_frame.focus()
+        self.initial_frame.select_range(0, tk.END)
 
         buttons = tk.Frame(frame)
         buttons.grid(column=0, columnspan=2, row=4)
         cancel = tk.Button(buttons, text='Cancel', command=self.cancel)
         cancel.pack(side='left')
-        save = tk.Button(buttons, text='Save', command=self.save)
+        save = tk.Button(buttons, text='Save & advance', command=self.save)
         save.pack(side='right')
 
     def handle_destroy(self, event):
@@ -53,10 +48,8 @@ class ReplaceReelPopup(tk.Toplevel):
 
     def save(self):
         now = int(time.time())
-        description = self.description.get()
-        total_frames = int(self.total_frames.get() or '1')
         initial_frame = int(self.initial_frame.get() or '0')
-        new_reel = Reel(now, description, total_frames, 0)
+        new_reel = Reel(now, '', 2400, 0)
         self.close(new_reel, initial_frame)
 
 
