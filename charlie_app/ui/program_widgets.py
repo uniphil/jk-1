@@ -15,10 +15,8 @@ class Program(ttk.Frame):
         self.projector_current_frame = projector_current_frame
         self.on_run = on_run
 
-        self.camera_total_frames = tk.IntVar()
+        self.camera_total_frames = tk.StringVar()
         self.camera_total_frames.set(1)
-        self.projector_total_frames = tk.IntVar()
-        self.projector_total_frames.set(1)
         self.projector_reverse = tk.BooleanVar()
         self.projector_reverse.set(False)
 
@@ -68,18 +66,11 @@ class Program(ttk.Frame):
 
         projector_total_frames_label = ttk.Label(
             projector_frame, text='Projector frames')
-        projector_total_frames_entry = ttk.Entry(
-            projector_frame, textvariable=self.projector_total_frames, width=4)
         projector_reverse_option = ttk.Checkbutton(
             projector_frame, text='Reverse', variable=self.projector_reverse)
         self.projector_frames_label = ttk.Label(projector_frame)
 
-        projector_total_frames_entry.bind(
-            '<KeyRelease>', self.set_projector_frames)
-        projector_total_frames_entry.bind(
-            '<FocusOut>', self.set_projector_frames)
         projector_total_frames_label.grid(row=0, column=0)
-        projector_total_frames_entry.grid(row=0, column=1)
         projector_reverse_option.grid(row=0, column=2)
         self.projector_frames_label.grid(row=1, column=0, columnspan=3)
 
@@ -103,18 +94,7 @@ class Program(ttk.Frame):
             projector_frames = camera_frames / rate
         else:
             projector_frames = camera_frames * rate
-        self.projector_total_frames.set(projector_frames)
-        self.update_camera_frame_label()
-        self.update_projector_frame_label()
-
-    def set_projector_frames(self, *args):
-        rate = self.rate_adjust.get()
-        projector_frames = self.projector_total_frames.get()
-        if self.rate_inverse.get():
-            camera_frames = projector_frames * rate
-        else:
-            camera_frames = projector_frames / rate
-        self.camera_total_frames.set(camera_frames)
+        # self.projector_total_frames.set(projector_frames)
         self.update_camera_frame_label()
         self.update_projector_frame_label()
 
@@ -145,7 +125,12 @@ class Program(ttk.Frame):
     def run_program(self):
         print 'go time'
         cam_frames = self.camera_total_frames.get()
-        proj_frames = self.projector_total_frames.get()
+        if cam_frames == '':
+            # TODO: alert
+            return
+        cam_frames = int(cam_frames)
+        # proj_frames = self.projector_total_frames.get()
+        proj_frames = 1  # FIXME
         rate = self.rate_adjust.get()
         proj_direction = -1 if self.projector_reverse.get() else 1
         if self.rate_inverse.get():
@@ -156,6 +141,7 @@ class Program(ttk.Frame):
 
     def update_rate(self, *args):
         rate = self.rate_adjust.get()
+        # if rate is None None None None None None
         cam, proj = (rate, 1) if self.rate_inverse.get() else (1, rate)
         ratio = '{}:{}'.format(cam, proj)
         ratio_text = 'Advance {} camera frames for every '\
@@ -167,7 +153,7 @@ class Program(ttk.Frame):
         self.update_projector_frame_label()
 
     def update_camera_frame_label(self, *args):
-        camera_frames = self.camera_total_frames.get()
+        camera_frames = int(self.camera_total_frames.get() or '1')
         start_frame = self.camera_current_frame.get()
         end_frame = start_frame + camera_frames
         use = float(camera_frames) / self.camera_reel.total_frames\
@@ -177,7 +163,8 @@ class Program(ttk.Frame):
                 start_frame, end_frame, use))
 
     def update_projector_frame_label(self, *args):
-        frames = self.projector_total_frames.get()
+        # frames = self.projector_total_frames.get()
+        frames = 1  # fixme
         reverse = self.projector_reverse.get()
         start_frame = self.camera_current_frame.get()
         end_frame = start_frame + (-frames if reverse else frames)
