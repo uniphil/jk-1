@@ -32,7 +32,9 @@ class Program(ttk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        self.config(relief='solid', borderwidth=2)
+        self.config(
+            relief='groove',
+            borderwidth=2)
         title = ttk.Label(self, text='Printing program')
 
         camera_frame = ttk.Frame(self)

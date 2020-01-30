@@ -1,5 +1,7 @@
 import Tkinter as tk
+from datetime import date
 import time
+import tkFont
 import ttk
 
 from ..reel import Reel
@@ -197,7 +199,10 @@ class ReelInfo(ttk.Frame):
         self, master, device, reel, current_frame, update_reel,
         update_current_frame, advance_frames,
     ):
-        ttk.Frame.__init__(self, master, relief='solid', borderwidth=2)
+        ttk.Frame.__init__(
+            self, master,
+            relief='groove',
+            borderwidth=2)
         self.device = device
         self.current_frame = current_frame
         self.update_reel = update_reel
@@ -216,9 +221,16 @@ class ReelInfo(ttk.Frame):
 
         self.reel_frame = ttk.Frame(info_frame)
         self.description = ttk.Label(self.reel_frame)
-        self.loaded_label = ttk.Label(info_frame)
+        self.loaded_label = ttk.Label(
+            info_frame,
+            font=tkFont.Font(size=12, slant='italic'),
+            foreground='#777')
         self.frame_frame = ttk.Frame(info_frame)
-        self.frame_count_label = ttk.Label(self.frame_frame)
+        self.frame_count_label = ttk.Label(
+            self.frame_frame, text='Current frame:')
+        self.current_frame_number = ttk.Label(
+            self.frame_frame,
+            font=tkFont.Font(size=24, weight='bold'))
 
         self.frame_override_button = ttk.Button(
             self.frame_frame, text='edit', command=self.edit_count)
@@ -240,6 +252,7 @@ class ReelInfo(ttk.Frame):
 
         self.frame_frame.grid(row=2, column=0, sticky=tk.W)
         self.frame_count_label.grid(row=0, column=0)
+        self.current_frame_number.grid(row=1, column=0, columnspan=2)
         self.frame_override_button.grid(row=0, column=1)
 
         self.replace_button.grid(row=0, column=1)
@@ -299,9 +312,8 @@ class ReelInfo(ttk.Frame):
         self.manual_button.config(state=tk.NORMAL)
 
     def update(self, reel):
-        self.description.config(text='Reel: {}'.format(reel.description))
-        self.loaded_label.config(
-            text='Loaded: {}'.format(time.ctime(reel.loaded_at)))
-        self.frame_count_label.config(text='Frame: {} of {} ({:.1%})'.format(
-            self.current_frame.get(), reel.total_frames,
-            self.current_frame.get() / float(reel.total_frames)))
+        self.description.config(text='Current reel: {}'.format(
+            reel.description))
+        self.loaded_label.config(text='last reset {:%b %d, %Y}'.format(
+            date.fromtimestamp(reel.loaded_at)))
+        self.current_frame_number.config(text=self.current_frame.get())

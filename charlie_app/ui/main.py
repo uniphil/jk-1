@@ -1,5 +1,6 @@
 import time
 import Tkinter as tk
+import tkFont
 import ttk
 
 from .reel_widgets import ReelInfo
@@ -66,10 +67,16 @@ class App(ttk.Frame):
         self.status_bar = StatusBar(
             self, self.latest_update, self.handle_cancel)
 
-        camera_label = ttk.Label(self.camera_frame, text='Camera')
+        camera_label = ttk.Label(
+            self.camera_frame,
+            text='Camera',
+            font=tkFont.Font(size=20))
         self.camera_reel_widget = None
 
-        projector_label = ttk.Label(self.projector_frame, text='Projector')
+        projector_label = ttk.Label(
+            self.projector_frame,
+            text='Projector',
+            font=tkFont.Font(size=20))
         self.projector_reel_widget = None
 
         self.program = Program(
