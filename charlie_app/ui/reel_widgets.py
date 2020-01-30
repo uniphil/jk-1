@@ -214,7 +214,7 @@ class ReelInfo(tk.Frame):
     def close_replace_popup(self, reel=None, initial_frame=None):
         if reel is not None:
             self.update_reel(reel)
-            if initial_frame is not None:
+            if initial_frame is not None and initial_frame != 0:
                 self.handle_advance(initial_frame)
         self.reel_popup.destroy()
         self.reel_popup = None
