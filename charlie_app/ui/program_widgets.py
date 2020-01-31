@@ -80,7 +80,7 @@ class Cycle(tk.Frame):
             action,
             text=chr(ord('A') + action_index),
             font=tkFont.Font(size=21),
-            background='yellow',
+            background='#ffc',
             width=2)
         setattr(action, 'action_number', action_number)
         control_frame = tk.Frame(action)
@@ -127,11 +127,20 @@ class Program(tk.Frame):
 
     def create_widgets(self):
         self.cycles_frame = ScrollableFrame(self, background=BG)
-        self.cycles = [Cycle(
-            self.cycles_frame.scrollable_frame,
-            borderwidth=1, relief='raised')]
+        cycles_list = tk.Frame(self.cycles_frame.scrollable_frame)
+        cycles_list.grid(row=0, column=0, sticky=tk.E+tk.W)
+        cycles_list.columnconfigure(0, weight=1)
+        self.cycles = [Cycle(cycles_list, borderwidth=1, relief='raised')]
         for i, cycle in enumerate(self.cycles):
             cycle.grid(row=i, column=0, sticky=tk.E+tk.W)
+
+        cycles_buttons = tk.Frame(
+            self.cycles_frame.scrollable_frame, background=BG)
+        cycles_buttons.grid(row=1, column=0, pady=(16, 24))
+        tk.Label(
+            cycles_buttons, text='hiiiii', background=BG
+        ).grid(row=0, column=0)
+
         self.cycles_frame.grid(row=0, column=0, sticky=tk.N+tk.E+tk.S+tk.W)
         self.cycles_frame.scrollable_frame.columnconfigure(0, weight=1)
 
