@@ -98,7 +98,8 @@ class Cycle(tk.Frame):
             font=tkFont.Font(slant='italic'),
             foreground='#777',
             background=ACTION_HL)
-        self.no_actions_label.grid(row=0, column=0, ipady=6, sticky=tk.E+tk.W)
+        self.no_actions_label.grid(
+            row=0, column=0, pady=(8, 0), ipady=6, sticky=tk.E+tk.W)
         self.actions_frame.columnconfigure(0, weight=1)
 
         self.actions_frame.grid(
@@ -124,8 +125,6 @@ class Cycle(tk.Frame):
         self.count_value.select_range(0, tk.END)
 
     def add_action(self, cls):
-        print 'add action', len(self.actions)
-        self.actions
         self.no_actions_label.grid_forget()
         action_index = len(self.actions)
         action_border = tk.Frame(self.actions_frame, background='#eee')
@@ -142,7 +141,7 @@ class Cycle(tk.Frame):
         control_frame = tk.Frame(action)
         control_frame.grid(row=1, column=0, columnspan=2, pady=2, sticky=tk.W)
         remove = tk.Label(
-            action, text='✕', foreground='#833', width=3, font=self.smol,
+            action, text='✕', foreground='#777', width=3, font=self.smol,
             justify=tk.CENTER)
         remove.bind('<Button-1>', lambda _: self.remove_action(action_border))
         remove.grid(row=0, column=1, rowspan=2, sticky=tk.N+tk.W)
@@ -150,12 +149,8 @@ class Cycle(tk.Frame):
         self.actions.append(action_border)
         device_action = cls(control_frame)
         device_action.grid(row=0, column=0, padx=6)
-        print self.actions
-        print '.'
 
     def remove_action(self, action):
-        print 'remove action'
-        print self.actions
         self.actions = [a for a in self.actions if a is not action]
         action.destroy()
         for i, action in enumerate(self.actions):
@@ -163,8 +158,6 @@ class Cycle(tk.Frame):
         if len(self.actions) == 0:
             self.no_actions_label.grid(
                 row=0, column=0, ipady=6, sticky=tk.E+tk.W)
-        print self.actions
-        print '.'
 
 
 class Program(tk.Frame):
@@ -191,6 +184,11 @@ class Program(tk.Frame):
             cycles_buttons, text='+ Step', highlightbackground=BG,
             command=self.add_step,
         ).grid(row=0, column=0)
+        tk.Button(
+            cycles_buttons, text='Run Program', highlightbackground=BG,
+            font=tkFont.Font(weight='bold'),
+            command=self.run_program,
+        ).grid(row=0, column=1, ipady=6)
 
         self.cycles_frame.grid(row=0, column=0, sticky=tk.N+tk.E+tk.S+tk.W)
         self.cycles_frame.scrollable_frame.columnconfigure(0, weight=1)
@@ -203,7 +201,20 @@ class Program(tk.Frame):
         cycle = Cycle(
             self.cycles_list, cycle_index, borderwidth=1, relief='raised')
         cycle.grid(row=cycle_index, column=0, pady=(0, 16), sticky=tk.E+tk.W)
+        rm = tk.Label(
+            cycle, text='✕', foreground='#833', width=2, justify=tk.CENTER)
+        rm.place(relx=1, anchor=tk.NE)
+        rm.bind('<Button-1>', lambda _: self.remove_step(cycle))
         self.cycles.append(cycle)
+
+    def remove_step(self, cycle):
+        self.cycles = [a for a in self.cycles if a is not cycle]
+        cycle.destroy()
+        for i, cycle in enumerate(self.cycles):
+            cycle.grid(row=i, column=0, sticky=tk.E+tk.W)
+
+    def run_program(self):
+        print 'goooooo'
 
         # camera_total_frames_entry.bind('<KeyRelease>', self.set_camera_frames)
         # camera_total_frames_entry.bind('<FocusOut>', self.set_camera_frames)
