@@ -44,7 +44,7 @@ class Cycle(tk.Frame):
         self.actions_frame = tk.Frame(self)
         self.no_actions_label = tk.Label(
             self.actions_frame,
-            text='Add an action to activate this cycle',
+            text='Add an action to activate this step',
             font=tkFont.Font(slant='italic'),
             foreground='#777',
             background='#e6fae3')
@@ -58,19 +58,19 @@ class Cycle(tk.Frame):
         add_actions_frame = tk.Frame(self)
         add_actions_frame.grid(row=1, column=1)
 
-        actions_label = tk.Label(add_actions_frame, text='Actions:')
-        actions_label.grid(row=0, column=0)
+        # actions_label = tk.Label(add_actions_frame, text='Actions:')
+        # actions_label.grid(row=0, column=0)
 
         camera_cam_button = tk.Button(
             add_actions_frame,
-            text='+ Camera',
+            text='+ Camera action',
             command=self.add_camera_action)
-        camera_cam_button.grid(row=0, column=1)
+        camera_cam_button.grid(row=0, column=0)
         camera_proj_button = tk.Button(
             add_actions_frame,
-            text='+ Projector',
+            text='+ Projector action',
             command=self.add_projector_action)
-        camera_proj_button.grid(row=0, column=2)
+        camera_proj_button.grid(row=0, column=1)
 
     def handle_focus_count(self, *_):
         self.count_value.focus()
@@ -140,7 +140,7 @@ class Program(tk.Frame):
         self.cycles_list.columnconfigure(0, weight=1)
         cycle = Cycle(self.cycles_list, borderwidth=1, relief='raised')
         self.cycles.append(cycle)
-        cycle.grid(row=0, column=0, pady=(0, 6), sticky=tk.E+tk.W)
+        cycle.grid(row=0, column=0, pady=(0, 16), sticky=tk.E+tk.W)
 
         cycles_buttons = tk.Frame(
             self.cycles_frame.scrollable_frame, background=BG)
@@ -159,8 +159,8 @@ class Program(tk.Frame):
     def add_step(self):
         cycle_index = len(self.cycles)
         cycle = Cycle(
-            self.cycles_list, cycle_index,borderwidth=1, relief='raised')
-        cycle.grid(row=cycle_index, column=0, pady=(0, 6), sticky=tk.E+tk.W)
+            self.cycles_list, cycle_index, borderwidth=1, relief='raised')
+        cycle.grid(row=cycle_index, column=0, pady=(0, 16), sticky=tk.E+tk.W)
         self.cycles.append(cycle)
 
         # camera_total_frames_entry.bind('<KeyRelease>', self.set_camera_frames)
