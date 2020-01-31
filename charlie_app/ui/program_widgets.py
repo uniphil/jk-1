@@ -5,40 +5,90 @@ from scrollable_frame import ScrollableFrame
 
 
 BG = '#f2f2f2'
-ROW_BG = '#e6e6e6'
+STEP_HL = '#f0e0f8'
+ACTION_HL = '#e6fae3'
+
+
+class DeviceAction(tk.Frame):
+    def __init__(self, *args, **kwargs):
+        tk.Frame.__init__(self, *args, **kwargs)
+
+        self.frames = tk.StringVar()
+        self.frames.set('1')
+
+        self.smol = tkFont.Font(size=12)
+
+        self.frames_entry = tk.Entry(
+            self, textvariable=self.frames, width=5,
+            justify='center')
+        self.frames_entry.grid(
+            row=0, column=0, sticky=tk.W+tk.N+tk.S, ipadx=0, padx=0)
+        self.frames_entry.bind('<FocusIn>', self.select_frames_entry)
+
+        frames_label = tk.Label(
+            self, text='frame', font=self.smol)
+        frames_label.grid(row=0, column=1, sticky=tk.N+tk.S, padx=(0, 6))
+
+    def select_frames_entry(self, *_):
+        self.frames_entry.select_range(0, tk.END)
+
+
+class CameraAction(DeviceAction):
+    name = 'Camera'
+
+    def __init__(self, master, **kwargs):
+        DeviceAction.__init__(self, master, **kwargs)
+
+
+class ProjectorAction(DeviceAction):
+    name = 'Projector'
+
+    def __init__(self, master, **kwargs):
+        DeviceAction.__init__(self, master, **kwargs)
+
+        self.direction = tk.StringVar()
+        self.direction.set('fw')
+
+        fw_radio = tk.Radiobutton(
+            self, text='Advance', value='fw', variable=self.direction)
+        fw_radio.grid(row=0, column=2)
+
+        rw_radio = tk.Radiobutton(
+            self, text='Reverse', value='rw', variable=self.direction)
+        rw_radio.grid(row=0, column=3)
 
 
 class Cycle(tk.Frame):
     def __init__(self, master, index=0, **kwargs):
-        tk.Frame.__init__(
-            self, master, **kwargs)
+        tk.Frame.__init__(self, master, **kwargs)
         self.actions = []
         self.cycles_count = tk.StringVar()
         self.cycles_count.set('1')
 
-        count_bg = '#f0e0f8'
-        big = tkFont.Font(size=24)
-        small = tkFont.Font(size=11)
+        self.big = tkFont.Font(size=24)
+        self.med = tkFont.Font(size=18)
+        self.smol = tkFont.Font(size=10, weight='bold')
+        self.smolnb = tkFont.Font(size=10)
 
-        count_frame = tk.Frame(self, background=count_bg)
+        count_frame = tk.Frame(self, background=STEP_HL)
         count_frame.grid(row=0, column=0, rowspan=2, sticky=tk.N+tk.S+tk.W)
-        count_label = tk.Label(count_frame, text='Step', background=count_bg)
+        count_label = tk.Label(count_frame, text='Step', background=STEP_HL)
         count_label.grid(
             row=0, column=0, columnspan=2, sticky=tk.E+tk.W, pady=(16, 0))
         self.count_index = tk.Label(
-            count_frame, text=index+1, background=count_bg, width=7,
-            font=big)
+            count_frame, text=index+1, background=STEP_HL, width=7,
+            font=self.big)
         self.count_index.grid(row=1, column=0, columnspan=2, sticky=tk.E+tk.W)
 
         self.count_value = tk.Entry(
-            count_frame, textvariable=self.cycles_count, width=3,
+            count_frame, textvariable=self.cycles_count, width=4,
             highlightthickness=0, borderwidth=1, justify='center')
-        self.count_value.grid(row=2, column=0, pady=16, stick=tk.S+tk.E)
+        self.count_value.grid(row=2, column=1, pady=16, stick=tk.N+tk.W)
         self.count_value.bind('<FocusIn>', self.handle_focus_count)
         tk.Label(
-            count_frame, text='repeat', background=count_bg,
-            font=small
-        ).grid(row=2, column=1, pady=16, sticky=tk.S+tk.W)
+            count_frame, text='repeat', background=STEP_HL,
+            font=self.smolnb
+        ).grid(row=2, column=0, pady=16, sticky=tk.N+tk.E)
         count_frame.rowconfigure(2, weight=1)
 
         self.actions_frame = tk.Frame(self)
@@ -47,7 +97,7 @@ class Cycle(tk.Frame):
             text='Add an action to activate this step',
             font=tkFont.Font(slant='italic'),
             foreground='#777',
-            background='#e6fae3')
+            background=ACTION_HL)
         self.no_actions_label.grid(row=0, column=0, ipady=6, sticky=tk.E+tk.W)
         self.actions_frame.columnconfigure(0, weight=1)
 
@@ -58,71 +108,63 @@ class Cycle(tk.Frame):
         add_actions_frame = tk.Frame(self)
         add_actions_frame.grid(row=1, column=1)
 
-        # actions_label = tk.Label(add_actions_frame, text='Actions:')
-        # actions_label.grid(row=0, column=0)
-
         camera_cam_button = tk.Button(
             add_actions_frame,
             text='+ Camera action',
-            command=self.add_camera_action)
+            command=lambda: self.add_action(CameraAction))
         camera_cam_button.grid(row=0, column=0)
         camera_proj_button = tk.Button(
             add_actions_frame,
             text='+ Projector action',
-            command=self.add_projector_action)
+            command=lambda: self.add_action(ProjectorAction))
         camera_proj_button.grid(row=0, column=1)
 
     def handle_focus_count(self, *_):
         self.count_value.focus()
         self.count_value.select_range(0, tk.END)
 
-    def _get_action(self):
+    def add_action(self, cls):
+        print 'add action', len(self.actions)
+        self.actions
         self.no_actions_label.grid_forget()
         action_index = len(self.actions)
-        action = tk.Frame(self.actions_frame, background=ROW_BG)
+        action_border = tk.Frame(self.actions_frame, background='#eee')
+        action_border.grid(
+            row=action_index, column=0, pady=4, sticky=tk.N+tk.S+tk.E+tk.W)
+        action_border.columnconfigure(0, weight=1)
+        action = tk.Frame(action_border)
         action.grid(
-            row=action_index, column=0, sticky=tk.E+tk.W, pady=2)
-        action_number = tk.Label(
-            action,
-            text=chr(ord('A') + action_index),
-            font=tkFont.Font(size=21),
-            background='#ffc',
-            width=2)
-        setattr(action, 'action_number', action_number)
+            row=0, column=0, sticky=tk.E+tk.W, pady=(0, 1))
+        name = tk.Label(
+            action, text=cls.name.upper(), background=ACTION_HL,
+            font=self.smol)
+        name.grid(row=0, column=0, sticky=tk.N+tk.W, ipadx=4)
         control_frame = tk.Frame(action)
-        control_frame.grid(row=0, column=1)
-        remove = tk.Button(
-            action, text='✕', highlightbackground=ROW_BG,
-            command=lambda: self.remove_action(action))
-        remove.grid(row=0, column=2, sticky=tk.E)
+        control_frame.grid(row=1, column=0, columnspan=2, pady=2, sticky=tk.W)
+        remove = tk.Label(
+            action, text='✕', foreground='#833', width=3, font=self.smol,
+            justify=tk.CENTER)
+        remove.bind('<Button-1>', lambda _: self.remove_action(action_border))
+        remove.grid(row=0, column=1, rowspan=2, sticky=tk.N+tk.W)
         action.columnconfigure(1, weight=1)
-        action_number.grid(row=0, column=0, sticky=tk.N+tk.S)
-        self.actions.append(action)
-        return control_frame
-
-    def add_camera_action(self):
-        control_frame = self._get_action()
-        action = tk.Label(
-            control_frame, text='Camera:', background=ROW_BG,
-            font=tkFont.Font(weight='bold'))
-        action.grid(row=0, column=0)
-
-    def add_projector_action(self):
-        control_frame = self._get_action()
-        projector = tk.Label(
-            control_frame, text='Projector:', background=ROW_BG,
-            font=tkFont.Font(weight='bold'))
-        projector.grid(row=0, column=0)
+        self.actions.append(action_border)
+        device_action = cls(control_frame)
+        device_action.grid(row=0, column=0, padx=6)
+        print self.actions
+        print '.'
 
     def remove_action(self, action):
+        print 'remove action'
+        print self.actions
         self.actions = [a for a in self.actions if a is not action]
         action.destroy()
         for i, action in enumerate(self.actions):
-            action.action_number.configure(text=chr(ord('A') + i))
             action.grid(row=i, column=0, sticky=tk.E+tk.W)
         if len(self.actions) == 0:
             self.no_actions_label.grid(
                 row=0, column=0, ipady=6, sticky=tk.E+tk.W)
+        print self.actions
+        print '.'
 
 
 class Program(tk.Frame):

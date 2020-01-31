@@ -148,14 +148,11 @@ class ReelInfo(tk.Frame):
             font=big_font,
             padx=12)
 
-        self.manual_label = tk.Label(
-            manual_frame, text='Step',
-            font=tkFont.Font(weight='bold'))
         self.manual_bw = tk.Button(
-            manual_frame, text='Reverse',
+            manual_frame, text='Reverse 1',
             command=lambda: self.handle_advance(-1))
         self.manual_fw = tk.Button(
-            manual_frame, text='Advance',
+            manual_frame, text='Advance 1',
             command=lambda: self.handle_advance(1))
 
         self.loaded_label = tk.Label(
@@ -174,9 +171,8 @@ class ReelInfo(tk.Frame):
         self.current_frame_number.grid(row=0, column=1, rowspan=2)
 
         manual_frame.grid(row=1, column=0, pady=4)
-        self.manual_label.grid(row=0, column=0)
         self.manual_bw.grid(row=0, column=1)
-        self.manual_fw.grid(row=0, column=2)
+        self.manual_fw.grid(row=0, column=0)
 
         reel_frame.grid(row=2, column=0, pady=4)
         self.loaded_label.grid(row=0, column=0)
