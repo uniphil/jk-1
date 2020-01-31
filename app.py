@@ -65,5 +65,7 @@ if __name__ == '__main__':
             device.send(k103.init('P'))
             time.sleep(0.2)
         app = ui.App(device=device)
+        app.master.geometry('640x700')
+        app.master.minsize(512, 480)
         app.master.lift()  # dunno why this helps with first render
         app.mainloop()

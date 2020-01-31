@@ -76,9 +76,10 @@ class App(tk.Frame):
         self.projector_frame = tk.Frame(self, padx=16, background=BG)
         program_frame = tk.Frame(self, background=BG)
         program_frame.rowconfigure(0, weight=1)
-        status_border_frame = tk.Frame(self, background='#ddd')
+        status_border_frame = tk.Frame(self, background='#ccc')
         self.status_bar = StatusBar(
-            status_border_frame, self.latest_update, self.handle_cancel)
+            status_border_frame, self.latest_update, self.handle_cancel,
+            background='#eee')
 
         camera_label = tk.Label(
             self.camera_frame,
@@ -96,12 +97,6 @@ class App(tk.Frame):
             pady=6)
         self.projector_reel_widget = None
 
-        # program_label = tk.Label(
-        #     program_frame,
-        #     background=BG,
-        #     text='Program',
-        #     font=tkFont.Font(size=20),
-        #     pady=6)
         self.program = Program(program_frame, self.run_program)
 
         self.camera_frame.grid(row=0, column=0, sticky=tk.N+tk.W)
@@ -114,7 +109,6 @@ class App(tk.Frame):
             row=1, column=0, columnspan=2, sticky=tk.N+tk.E+tk.W+tk.S,
             padx=(16, 0), pady=(16, 0))
         program_frame.columnconfigure(0, weight=1)
-        # program_label.grid(row=0, column=0)
         self.program.grid(row=0, column=0, sticky=tk.N+tk.E+tk.S+tk.W)
 
         # tk.Button(

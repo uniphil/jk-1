@@ -3,6 +3,8 @@ import time
 
 LOG_TTL = 5
 
+BG = '#eee'
+
 
 class StatusBar(tk.Frame):
     def __init__(self, master, latest_update, on_cancel, *args, **kwargs):
@@ -18,10 +20,12 @@ class StatusBar(tk.Frame):
         # self.progress_bar.grid(row=0, column=0, padx=6)
 
         self.cancel_button = tk.Button(
-            self, text='Cancel', command=self.cancel)
+            self, text='Cancel', command=self.cancel,
+            highlightbackground=BG)
 
-        tk.Label(self, textvariable=latest_update).grid(
-            row=0, column=2, sticky=tk.W)
+        tk.Label(
+            self, textvariable=latest_update, background=BG,
+        ).grid(row=0, column=2, sticky=tk.W)
         self.last_update_message.trace('w', self.handle_log_update)
 
     def handle_log_update(self, *args):
