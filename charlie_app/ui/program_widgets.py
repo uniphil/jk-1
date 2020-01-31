@@ -5,10 +5,11 @@ from scrollable_frame import ScrollableFrame
 
 
 BG = '#f2f2f2'
+ROW_BG = '#e6e6e6'
 
 
 class Cycle(tk.Frame):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, index=0, **kwargs):
         tk.Frame.__init__(
             self, master, **kwargs)
         self.actions = []
@@ -24,15 +25,16 @@ class Cycle(tk.Frame):
         count_label = tk.Label(count_frame, text='Step', background=count_bg)
         count_label.grid(
             row=0, column=0, columnspan=2, sticky=tk.E+tk.W, pady=(16, 0))
-        count_index = tk.Label(
-            count_frame, text='1', background=count_bg, width=7,
+        self.count_index = tk.Label(
+            count_frame, text=index+1, background=count_bg, width=7,
             font=big)
-        count_index.grid(row=1, column=0, columnspan=2, sticky=tk.E+tk.W)
+        self.count_index.grid(row=1, column=0, columnspan=2, sticky=tk.E+tk.W)
 
-        count_value = tk.Entry(
+        self.count_value = tk.Entry(
             count_frame, textvariable=self.cycles_count, width=3,
-            highlightthickness=0, borderwidth=1)
-        count_value.grid(row=2, column=0, pady=16, stick=tk.S+tk.E)
+            highlightthickness=0, borderwidth=1, justify='center')
+        self.count_value.grid(row=2, column=0, pady=16, stick=tk.S+tk.E)
+        self.count_value.bind('<FocusIn>', self.handle_focus_count)
         tk.Label(
             count_frame, text='repeat', background=count_bg,
             font=small
@@ -56,24 +58,28 @@ class Cycle(tk.Frame):
         add_actions_frame = tk.Frame(self)
         add_actions_frame.grid(row=1, column=1)
 
-        actions_label = tk.Label(add_actions_frame, text='+ Action')
+        actions_label = tk.Label(add_actions_frame, text='Actions:')
         actions_label.grid(row=0, column=0)
 
         camera_cam_button = tk.Button(
             add_actions_frame,
-            text='Camera',
+            text='+ Camera',
             command=self.add_camera_action)
         camera_cam_button.grid(row=0, column=1)
         camera_proj_button = tk.Button(
             add_actions_frame,
-            text='Projector',
+            text='+ Projector',
             command=self.add_projector_action)
         camera_proj_button.grid(row=0, column=2)
+
+    def handle_focus_count(self, *_):
+        self.count_value.focus()
+        self.count_value.select_range(0, tk.END)
 
     def _get_action(self):
         self.no_actions_label.grid_forget()
         action_index = len(self.actions)
-        action = tk.Frame(self.actions_frame, borderwidth=1, relief='ridge')
+        action = tk.Frame(self.actions_frame, background=ROW_BG)
         action.grid(
             row=action_index, column=0, sticky=tk.E+tk.W, pady=2)
         action_number = tk.Label(
@@ -86,7 +92,8 @@ class Cycle(tk.Frame):
         control_frame = tk.Frame(action)
         control_frame.grid(row=0, column=1)
         remove = tk.Button(
-            action, text='✕', command=lambda: self.remove_action(action))
+            action, text='✕', highlightbackground=ROW_BG,
+            command=lambda: self.remove_action(action))
         remove.grid(row=0, column=2, sticky=tk.E)
         action.columnconfigure(1, weight=1)
         action_number.grid(row=0, column=0, sticky=tk.N+tk.S)
@@ -96,14 +103,14 @@ class Cycle(tk.Frame):
     def add_camera_action(self):
         control_frame = self._get_action()
         action = tk.Label(
-            control_frame, text='Camera:',
+            control_frame, text='Camera:', background=ROW_BG,
             font=tkFont.Font(weight='bold'))
         action.grid(row=0, column=0)
 
     def add_projector_action(self):
         control_frame = self._get_action()
         projector = tk.Label(
-            control_frame, text='Projector:',
+            control_frame, text='Projector:', background=ROW_BG,
             font=tkFont.Font(weight='bold'))
         projector.grid(row=0, column=0)
 
@@ -122,23 +129,25 @@ class Program(tk.Frame):
     def __init__(self, master, on_run, **kwargs):
         tk.Frame.__init__(self, master, **kwargs)
         self.on_run = on_run
-
+        self.cycles = []
         self.create_widgets()
 
     def create_widgets(self):
         self.cycles_frame = ScrollableFrame(self, background=BG)
-        cycles_list = tk.Frame(self.cycles_frame.scrollable_frame)
-        cycles_list.grid(row=0, column=0, sticky=tk.E+tk.W)
-        cycles_list.columnconfigure(0, weight=1)
-        self.cycles = [Cycle(cycles_list, borderwidth=1, relief='raised')]
-        for i, cycle in enumerate(self.cycles):
-            cycle.grid(row=i, column=0, sticky=tk.E+tk.W)
+        self.cycles_list = tk.Frame(
+            self.cycles_frame.scrollable_frame, background=BG)
+        self.cycles_list.grid(row=0, column=0, sticky=tk.E+tk.W)
+        self.cycles_list.columnconfigure(0, weight=1)
+        cycle = Cycle(self.cycles_list, borderwidth=1, relief='raised')
+        self.cycles.append(cycle)
+        cycle.grid(row=0, column=0, pady=(0, 6), sticky=tk.E+tk.W)
 
         cycles_buttons = tk.Frame(
             self.cycles_frame.scrollable_frame, background=BG)
         cycles_buttons.grid(row=1, column=0, pady=(16, 24))
-        tk.Label(
-            cycles_buttons, text='hiiiii', background=BG
+        tk.Button(
+            cycles_buttons, text='+ Step', highlightbackground=BG,
+            command=self.add_step,
         ).grid(row=0, column=0)
 
         self.cycles_frame.grid(row=0, column=0, sticky=tk.N+tk.E+tk.S+tk.W)
@@ -146,6 +155,13 @@ class Program(tk.Frame):
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
+
+    def add_step(self):
+        cycle_index = len(self.cycles)
+        cycle = Cycle(
+            self.cycles_list, cycle_index,borderwidth=1, relief='raised')
+        cycle.grid(row=cycle_index, column=0, pady=(0, 6), sticky=tk.E+tk.W)
+        self.cycles.append(cycle)
 
         # camera_total_frames_entry.bind('<KeyRelease>', self.set_camera_frames)
         # camera_total_frames_entry.bind('<FocusOut>', self.set_camera_frames)
