@@ -12,6 +12,32 @@ class Cycle(tk.Frame):
         tk.Frame.__init__(
             self, master, **kwargs)
         self.actions = []
+        self.cycles_count = tk.StringVar()
+        self.cycles_count.set('1')
+
+        count_bg = '#f0e0f8'
+        big = tkFont.Font(size=24)
+        small = tkFont.Font(size=11)
+
+        count_frame = tk.Frame(self, background=count_bg)
+        count_frame.grid(row=0, column=0, rowspan=2, sticky=tk.N+tk.S+tk.W)
+        count_label = tk.Label(count_frame, text='Step', background=count_bg)
+        count_label.grid(
+            row=0, column=0, columnspan=2, sticky=tk.E+tk.W, pady=(16, 0))
+        count_index = tk.Label(
+            count_frame, text='1', background=count_bg, width=7,
+            font=big)
+        count_index.grid(row=1, column=0, columnspan=2, sticky=tk.E+tk.W)
+
+        count_value = tk.Entry(
+            count_frame, textvariable=self.cycles_count, width=3,
+            highlightthickness=0, borderwidth=1)
+        count_value.grid(row=2, column=0, pady=16, stick=tk.S+tk.E)
+        tk.Label(
+            count_frame, text='repeat', background=count_bg,
+            font=small
+        ).grid(row=2, column=1, pady=16, sticky=tk.S+tk.W)
+        count_frame.rowconfigure(2, weight=1)
 
         self.actions_frame = tk.Frame(self)
         self.no_actions_label = tk.Label(
@@ -24,15 +50,13 @@ class Cycle(tk.Frame):
         self.actions_frame.columnconfigure(0, weight=1)
 
         self.actions_frame.grid(
-            row=0, column=0, padx=6, pady=6, sticky=tk.E+tk.W)
-        self.columnconfigure(0, weight=1)
+            row=0, column=1, padx=6, pady=6, sticky=tk.E+tk.W)
+        self.columnconfigure(1, weight=1)
 
         add_actions_frame = tk.Frame(self)
-        add_actions_frame.grid(row=1, column=0)
+        add_actions_frame.grid(row=1, column=1)
 
-        actions_label = tk.Label(
-            add_actions_frame, text='+ Action',
-            font=tkFont.Font(weight='bold'))
+        actions_label = tk.Label(add_actions_frame, text='+ Action')
         actions_label.grid(row=0, column=0)
 
         camera_cam_button = tk.Button(
@@ -47,6 +71,7 @@ class Cycle(tk.Frame):
         camera_proj_button.grid(row=0, column=2)
 
     def _get_action(self):
+        self.no_actions_label.grid_forget()
         action_index = len(self.actions)
         action = tk.Frame(self.actions_frame, borderwidth=1, relief='ridge')
         action.grid(
@@ -54,30 +79,33 @@ class Cycle(tk.Frame):
         action_number = tk.Label(
             action,
             text=chr(ord('A') + action_index),
-            font=tkFont.Font(size=21, weight='bold'),
+            font=tkFont.Font(size=21),
             background='yellow',
             width=2)
         setattr(action, 'action_number', action_number)
+        control_frame = tk.Frame(action)
+        control_frame.grid(row=0, column=1)
         remove = tk.Button(
             action, text='✕', command=lambda: self.remove_action(action))
         remove.grid(row=0, column=2, sticky=tk.E)
         action.columnconfigure(1, weight=1)
         action_number.grid(row=0, column=0, sticky=tk.N+tk.S)
-        return action
+        self.actions.append(action)
+        return control_frame
 
     def add_camera_action(self):
-        self.no_actions_label.grid_forget()
-        action = self._get_action()
-        camera = tk.Label(action, text='Camera:')
-        camera.grid(row=0, column=1)
-        self.actions.append(action)
+        control_frame = self._get_action()
+        action = tk.Label(
+            control_frame, text='Camera:',
+            font=tkFont.Font(weight='bold'))
+        action.grid(row=0, column=0)
 
     def add_projector_action(self):
-        self.no_actions_label.grid_forget()
-        action = self._get_action()
-        projector = tk.Label(action, text='Projector:')
-        projector.grid(row=0, column=1)
-        self.actions.append(action)
+        control_frame = self._get_action()
+        projector = tk.Label(
+            control_frame, text='Projector:',
+            font=tkFont.Font(weight='bold'))
+        projector.grid(row=0, column=0)
 
     def remove_action(self, action):
         self.actions = [a for a in self.actions if a is not action]
@@ -98,11 +126,12 @@ class Program(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        self.cycles_frame = ScrollableFrame(
-            self, relief='raised', borderwidth=1)
-        self.cycles = [Cycle(self.cycles_frame.scrollable_frame)]
+        self.cycles_frame = ScrollableFrame(self, background=BG)
+        self.cycles = [Cycle(
+            self.cycles_frame.scrollable_frame,
+            borderwidth=1, relief='raised')]
         for i, cycle in enumerate(self.cycles):
-            cycle.grid(row=i, column=0, pady=2, sticky=tk.E+tk.W)
+            cycle.grid(row=i, column=0, sticky=tk.E+tk.W)
         self.cycles_frame.grid(row=0, column=0, sticky=tk.N+tk.E+tk.S+tk.W)
         self.cycles_frame.scrollable_frame.columnconfigure(0, weight=1)
 

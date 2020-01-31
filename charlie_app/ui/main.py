@@ -74,7 +74,7 @@ class App(tk.Frame):
 
         self.camera_frame = tk.Frame(self, padx=16, background=BG)
         self.projector_frame = tk.Frame(self, padx=16, background=BG)
-        program_frame = tk.Frame(self, padx=12, pady=16, background=BG)
+        program_frame = tk.Frame(self, background=BG)
         program_frame.rowconfigure(1, weight=1)
         status_border_frame = tk.Frame(self, background='#ddd')
         self.status_bar = StatusBar(
@@ -111,7 +111,8 @@ class App(tk.Frame):
         projector_label.grid(row=0, column=0)
 
         program_frame.grid(
-            row=1, column=0, columnspan=2, sticky=tk.N+tk.E+tk.W+tk.S)
+            row=1, column=0, columnspan=2, sticky=tk.N+tk.E+tk.W+tk.S,
+            padx=(16, 0), pady=(16, 0))
         program_frame.columnconfigure(0, weight=1)
         program_label.grid(row=0, column=0)
         self.program.grid(row=1, column=0, sticky=tk.N+tk.E+tk.S+tk.W)
