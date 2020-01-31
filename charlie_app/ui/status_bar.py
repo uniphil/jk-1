@@ -5,8 +5,8 @@ LOG_TTL = 5
 
 
 class StatusBar(tk.Frame):
-    def __init__(self, master, latest_update, on_cancel):
-        tk.Frame.__init__(self, master)
+    def __init__(self, master, latest_update, on_cancel, *args, **kwargs):
+        tk.Frame.__init__(self, master, *args, **kwargs)
         self.last_update_message = latest_update
         self.cancel = on_cancel
         self.last_update_time = time.time()

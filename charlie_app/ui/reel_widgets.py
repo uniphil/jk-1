@@ -113,8 +113,8 @@ class ReelInfo(tk.Frame):
     ):
         tk.Frame.__init__(
             self, master,
-            relief='groove',
-            borderwidth=2,
+            relief='raised',
+            borderwidth=1,
             padx=8)
         self.device = device
         self.current_frame = current_frame
@@ -138,7 +138,7 @@ class ReelInfo(tk.Frame):
             frame_frame, text='Current frame')
         self.frame_override_button = tk.Label(
             frame_frame,
-            text='override',
+            text='edit',
             foreground='#77C',
             cursor='pencil',
             font=tkFont.Font(size=12))
@@ -152,10 +152,10 @@ class ReelInfo(tk.Frame):
             manual_frame, text='Step',
             font=tkFont.Font(weight='bold'))
         self.manual_bw = tk.Button(
-            manual_frame, text='Backward',
+            manual_frame, text='Reverse',
             command=lambda: self.handle_advance(-1))
         self.manual_fw = tk.Button(
-            manual_frame, text='Forward',
+            manual_frame, text='Advance',
             command=lambda: self.handle_advance(1))
 
         self.loaded_label = tk.Label(
@@ -163,7 +163,7 @@ class ReelInfo(tk.Frame):
             font=tkFont.Font(size=12, slant='italic'),
             foreground='#777')
         self.replace_button = tk.Button(
-            reel_frame, text='New reel',
+            reel_frame, text='Change reel',
             command=self.replace_reel)
 
         frame_frame.grid(row=0, column=0, pady=4)

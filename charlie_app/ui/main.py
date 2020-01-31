@@ -9,12 +9,13 @@ from .. import k103
 from ..reel import FRAME_CMD, REEL_CMD, Reel
 
 PACKET_USER_LOG = 0b11 << 6
+BG = '#f2f2f2'
 
 
 class App(tk.Frame):
     def __init__(self, device):
         t_init = time.time()
-        tk.Frame.__init__(self, None, padx=12, pady=0)
+        tk.Frame.__init__(self, None, background=BG)
         self.device = device
         setattr(device, 'handle_packet', self.handle_packet)
         self.original_alt_packet_handler = device.handle_alt_mode_packet
@@ -68,51 +69,62 @@ class App(tk.Frame):
         top = self.winfo_toplevel()
         top.rowconfigure(0, weight=1)
         top.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
 
-        self.camera_frame = tk.Frame(self)
-        self.projector_frame = tk.Frame(self)
-        program_frame = tk.Frame(self)
+        self.camera_frame = tk.Frame(self, padx=16, background=BG)
+        self.projector_frame = tk.Frame(self, padx=16, background=BG)
+        program_frame = tk.Frame(self, padx=12, pady=16, background=BG)
+        program_frame.rowconfigure(1, weight=1)
+        status_border_frame = tk.Frame(self, background='#ddd')
         self.status_bar = StatusBar(
-            self, self.latest_update, self.handle_cancel)
+            status_border_frame, self.latest_update, self.handle_cancel)
 
         camera_label = tk.Label(
             self.camera_frame,
+            background=BG,
             text='Camera',
             font=tkFont.Font(size=20),
-            pady=10)
+            pady=6)
         self.camera_reel_widget = None
 
         projector_label = tk.Label(
             self.projector_frame,
+            background=BG,
             text='Projector',
             font=tkFont.Font(size=20),
-            pady=10)
+            pady=6)
         self.projector_reel_widget = None
 
         program_label = tk.Label(
-            program_frame, text='Program', font=tkFont.Font(size=20), pady=10)
-        self.program = Program(
-            program_frame, self.camera_reel, self.camera_current_frame,
-            self.projector_reel, self.projector_current_frame,
-            self.run_program)
+            program_frame,
+            background=BG,
+            text='Program',
+            font=tkFont.Font(size=20),
+            pady=6)
+        self.program = Program(program_frame, self.run_program)
 
-        self.camera_frame.grid(row=0, column=0, sticky=tk.E+tk.W)
-        self.projector_frame.grid(row=0, column=1, sticky=tk.E+tk.W)
-        program_frame.grid(row=1, column=0, columnspan=2)
-
+        self.camera_frame.grid(row=0, column=0, sticky=tk.N+tk.W)
         camera_label.grid(row=0, column=0)
+
+        self.projector_frame.grid(row=0, column=1, sticky=tk.N+tk.E)
         projector_label.grid(row=0, column=0)
 
+        program_frame.grid(
+            row=1, column=0, columnspan=2, sticky=tk.N+tk.E+tk.W+tk.S)
+        program_frame.columnconfigure(0, weight=1)
         program_label.grid(row=0, column=0)
-        self.program.grid(row=1, column=0)
+        self.program.grid(row=1, column=0, sticky=tk.N+tk.E+tk.S+tk.W)
 
         # tk.Button(
         #     self, text='Dump',
         #     command=lambda: self.device.send(k103.dump('T'))).grid()
 
-        self.status_bar.grid(row=2, column=0, columnspan=2, sticky=tk.E+tk.W)
+        status_border_frame.grid(
+            row=2, column=0, columnspan=2, sticky=tk.E+tk.W)
+        status_border_frame.columnconfigure(0, weight=1)
+        self.status_bar.grid(
+            row=0, column=0, columnspan=2, sticky=tk.E+tk.W, pady=(1, 0))
 
     def handle_packet(self, bs):
         stuff = iter(bs)
@@ -262,7 +274,7 @@ class App(tk.Frame):
         if persist:
             self.device.send(k103.update_reel('C', reel))
         self.camera_current_frame.set(reel.current_frame)
-        self.program.update_camera_reel(reel)
+        # self.program.update_camera_reel(reel)
 
     def replace_projector_reel(self, reel, persist=True):
         if self.projector_reel is None:
@@ -273,7 +285,7 @@ class App(tk.Frame):
         if persist:
             self.device.send(k103.update_reel('P', reel))
         self.projector_current_frame.set(reel.current_frame)
-        self.program.update_projector_reel(reel)
+        # self.program.update_projector_reel(reel)
 
     def override_camera_frame(self, new_frame):
         self.camera_reel.current_frame = new_frame
