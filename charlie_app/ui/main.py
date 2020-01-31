@@ -297,6 +297,8 @@ class App(tk.Frame):
 
         def run_projector_program():
             print 'projector: {}'.format(n_proj)
+            if n_proj == 0:
+                return next_program_step()
             self.device.send(k103.advance('P', n_proj))
             self.main_program_next = next_program_step
             # TODO: schedule a checkup
@@ -304,6 +306,8 @@ class App(tk.Frame):
 
         print 'camera: {}'.format(n_cam)
         self.main_program_next = run_projector_program
+        if n_cam == 0:
+            return run_projector_program()
         self.device.send(k103.advance('C', n_cam))
         # TODO: schedule a checkup
         # self.after(100 + 900 * abs(n_cam), run_projector_program)

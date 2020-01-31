@@ -27,7 +27,7 @@ class DeviceAction(tk.Frame):
 
         frames_label = tk.Label(
             self, text='frame', font=self.smol)
-        frames_label.grid(row=0, column=1, sticky=tk.N+tk.S, padx=(0, 6))
+        frames_label.grid(row=0, column=1, sticky=tk.N+tk.S, padx=(0, 12))
 
     def select_frames_entry(self, *_):
         self.frames_entry.select_range(0, tk.END)
@@ -50,11 +50,13 @@ class ProjectorAction(DeviceAction):
         self.direction.set('fw')
 
         fw_radio = tk.Radiobutton(
-            self, text='Advance', value='fw', variable=self.direction)
+            self, text='advance', value='fw', variable=self.direction,
+            font=self.smol)
         fw_radio.grid(row=0, column=2)
 
         rw_radio = tk.Radiobutton(
-            self, text='Reverse', value='rw', variable=self.direction)
+            self, text='reverse', value='rw', variable=self.direction,
+            font=self.smol)
         rw_radio.grid(row=0, column=3)
 
 
@@ -149,6 +151,7 @@ class Cycle(tk.Frame):
         self.actions.append(action_border)
         device_action = cls(control_frame)
         device_action.grid(row=0, column=0, padx=6)
+        setattr(action_border, 'action', device_action)
 
     def remove_action(self, action):
         self.actions = [a for a in self.actions if a is not action]
@@ -184,11 +187,11 @@ class Program(tk.Frame):
             cycles_buttons, text='+ Step', highlightbackground=BG,
             command=self.add_step,
         ).grid(row=0, column=0)
-        tk.Button(
+        self.run_button = tk.Button(
             cycles_buttons, text='Run Program', highlightbackground=BG,
             font=tkFont.Font(weight='bold'),
-            command=self.run_program,
-        ).grid(row=0, column=1, ipady=6)
+            command=self.run_program)
+        self.run_button.grid(row=0, column=1, ipady=6)
 
         self.cycles_frame.grid(row=0, column=0, sticky=tk.N+tk.E+tk.S+tk.W)
         self.cycles_frame.scrollable_frame.columnconfigure(0, weight=1)
@@ -214,78 +217,21 @@ class Program(tk.Frame):
             cycle.grid(row=i, column=0, sticky=tk.E+tk.W)
 
     def run_program(self):
-        print 'goooooo'
+        program = []
+        for cycle in self.cycles:
+            for _ in range(int(cycle.cycles_count.get())):
+                for a in cycle.actions:
+                    n = int(a.action.frames.get())
+                    if a.action.name == 'Camera':
+                        program.append((n, 0))
+                    else:
+                        if a.action.direction.get() == 'rw':
+                            n *= -1
+                        program.append((0, n))
+        self.on_run(program)
 
-        # camera_total_frames_entry.bind('<KeyRelease>', self.set_camera_frames)
-        # camera_total_frames_entry.bind('<FocusOut>', self.set_camera_frames)
-        # camera_total_frames_label.grid(row=0, column=0)
-        # camera_total_frames_entry.grid(row=0, column=1)
-        # self.camera_frames_label.grid(row=1, column=0, columnspan=2)
+    def disable(self):
+        self.run_button.config(state=tk.DISABLED, text='Program running...')
 
-        # ratio_label = tk.Label(rate_frame, text='Frame ratio:')
-        # faster_button = tk.Button(
-        #     rate_frame, text='←', command=self.adjust_rate_slower, width=1)
-        # self.rate_label = tk.Label(rate_frame)
-        # slower_button = tk.Button(
-        #     rate_frame, text='→', command=self.adjust_rate_faster, width=1)
-        # self.frame_ratio_text = tk.Label(rate_frame, text='asdf')
-        # ratio_label.grid(row=0, column=0)
-        # faster_button.grid(row=0, column=1)
-        # self.rate_label.grid(row=0, column=2)
-        # slower_button.grid(row=0, column=3)
-        # self.frame_ratio_text.grid(row=1, column=0, columnspan=5)
-
-        # projector_total_frames_label = tk.Label(
-        #     projector_frame, text='Projector frames')
-        # projector_reverse_option = tk.Checkbutton(
-        #     projector_frame, text='Reverse', variable=self.projector_reverse)
-        # self.projector_frames_label = tk.Label(projector_frame)
-
-        # projector_total_frames_label.grid(row=0, column=0)
-        # projector_reverse_option.grid(row=0, column=2)
-        # self.projector_frames_label.grid(row=1, column=0, columnspan=3)
-
-        # self.run_button = tk.Button(
-        #     self, text='Run program', command=self.run_program)
-
-        # title.grid(row=0, column=0, columnspan=3)
-
-        # camera_frame.grid(row=1, column=0, padx=6)
-        # rate_frame.grid(row=1, column=1, padx=24)
-        # projector_frame.grid(row=1, column=2, padx=6)
-
-        # self.run_button.grid(row=2, column=0, columnspan=3)
-
-        # self.update_rate()
-        # self.grid()
-
-    # def disable(self):
-    #     self.run_button.config(state=tk.DISABLED, text='Program running...')
-
-    # def enable(self):
-    #     self.run_button.config(state=tk.NORMAL, text='Run program')
-
-    # def run_program(self):
-    #     print 'go time'
-    #     cam_frames = self.camera_total_frames.get()
-    #     if cam_frames == '':
-    #         # TODO: alert
-    #         return
-    #     cam_frames = int(cam_frames)
-    #     # proj_frames = self.projector_total_frames.get()
-    #     proj_frames = 1  # FIXME
-    #     rate = self.rate_adjust.get()
-    #     proj_direction = -1 if self.projector_reverse.get() else 1
-    #     if self.rate_inverse.get():
-    #         program = [(rate, 1 * proj_direction) for _ in range(proj_frames)]
-    #     else:
-    #         program = [(1, rate * proj_direction) for _ in range(cam_frames)]
-    #     self.on_run(program)
-
-    # def update_camera_reel(self, reel):
-    #     self.camera_reel = reel
-    #     # self.update_camera_frame_label()
-
-    # def update_projector_reel(self, reel):
-    #     self.projector_reel = reel
-    #     # self.update_projector_frame_label()
+    def enable(self):
+        self.run_button.config(state=tk.NORMAL, text='Run program')
