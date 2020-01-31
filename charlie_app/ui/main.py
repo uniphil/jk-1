@@ -29,6 +29,9 @@ class App(tk.Frame):
         self.bind('<Destroy>', self.handle_destroy)
 
         self.master.title('JK-1 control')
+
+        self.camera_direction = tk.StringVar()
+        self.camera_direction.set('fw')
         self.latest_update = tk.StringVar()
         self.camera_reel = None
         self.camera_current_frame = tk.IntVar()
@@ -51,7 +54,8 @@ class App(tk.Frame):
         self.camera_reel_widget = ReelInfo(
             self.camera_frame, 'camera', self.camera_reel,
             self.camera_current_frame, self.replace_camera_reel,
-            self.override_camera_frame, self.handle_advance_frames)
+            self.override_camera_frame, self.handle_advance_frames,
+            self.camera_direction)
         self.camera_reel_widget.grid(row=1, column=0)
 
     def init_projector_reel(self, reel):
@@ -97,7 +101,8 @@ class App(tk.Frame):
             pady=6)
         self.projector_reel_widget = None
 
-        self.program = Program(program_frame, self.run_program)
+        self.program = Program(
+            program_frame, self.run_program, self.camera_direction)
 
         self.camera_frame.grid(row=0, column=0, sticky=tk.N+tk.W)
         camera_label.grid(row=0, column=0)

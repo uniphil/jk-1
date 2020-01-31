@@ -164,9 +164,10 @@ class Cycle(tk.Frame):
 
 
 class Program(tk.Frame):
-    def __init__(self, master, on_run, **kwargs):
+    def __init__(self, master, on_run, camera_direction, **kwargs):
         tk.Frame.__init__(self, master, **kwargs)
         self.on_run = on_run
+        self.camera_direction = camera_direction
         self.cycles = []
         self.create_widgets()
 
@@ -223,6 +224,8 @@ class Program(tk.Frame):
                 for a in cycle.actions:
                     n = int(a.action.frames.get())
                     if a.action.name == 'Camera':
+                        if self.camera_direction.get() == 'rw':
+                            n *= -1
                         program.append((n, 0))
                     else:
                         if a.action.direction.get() == 'rw':

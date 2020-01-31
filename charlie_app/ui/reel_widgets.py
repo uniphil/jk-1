@@ -109,7 +109,7 @@ class OverrideFramePopup(tk.Toplevel):
 class ReelInfo(tk.Frame):
     def __init__(
         self, master, device, reel, current_frame, update_reel,
-        update_current_frame, advance_frames,
+        update_current_frame, advance_frames, reel_direction=None
     ):
         tk.Frame.__init__(
             self, master,
@@ -121,6 +121,7 @@ class ReelInfo(tk.Frame):
         self.update_reel = update_reel
         self.update_current_frame = update_current_frame
         self.advance_frames = advance_frames
+        self.reel_direction = reel_direction
         self.reel_popup = None
         self.frame_override_popup = None
         self.manual_control_popup = None
@@ -148,12 +149,28 @@ class ReelInfo(tk.Frame):
             font=big_font,
             padx=12)
 
-        self.manual_bw = tk.Button(
-            manual_frame, text='Reverse 1',
-            command=lambda: self.handle_advance(-1))
+        fw_only = self.reel_direction is not None
         self.manual_fw = tk.Button(
-            manual_frame, text='Advance 1',
+            manual_frame, text='Step 1' if fw_only else 'Advance 1',
             command=lambda: self.handle_advance(1))
+        self.manual_fw.grid(
+            row=0, column=2 if fw_only else 0)
+
+        if fw_only:
+            fw_radio = tk.Radiobutton(
+                manual_frame, text='advance', value='fw',
+                variable=self.reel_direction)
+            fw_radio.grid(row=0, column=0)
+
+            rw_radio = tk.Radiobutton(
+                manual_frame, text='reverse', value='rw',
+                variable=self.reel_direction)
+            rw_radio.grid(row=0, column=1)
+        else:
+            self.manual_bw = tk.Button(
+                manual_frame, text='Reverse 1',
+                command=lambda: self.handle_advance(-1))
+            self.manual_bw.grid(row=0, column=1)
 
         self.loaded_label = tk.Label(
             reel_frame,
@@ -171,8 +188,6 @@ class ReelInfo(tk.Frame):
         self.current_frame_number.grid(row=0, column=1, rowspan=2)
 
         manual_frame.grid(row=1, column=0, pady=4)
-        self.manual_bw.grid(row=0, column=1)
-        self.manual_fw.grid(row=0, column=0)
 
         reel_frame.grid(row=2, column=0, pady=4)
         self.loaded_label.grid(row=0, column=0)
@@ -180,7 +195,8 @@ class ReelInfo(tk.Frame):
 
     def handle_advance(self, n):
         if (self.device == 'camera'):
-            self.advance_frames('C', n)
+            fw = self.reel_direction.get() == 'fw'
+            self.advance_frames('C', n if fw else -n)
         else:
             self.advance_frames('P', n)
 
