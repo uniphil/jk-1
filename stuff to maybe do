@@ -1,0 +1,48 @@
+```
+x fix FET drive
+x switch everything ttk -> tk so it works on olde mac
+x fix endianness wooo
+x fix crash on blank manual advance number
+x make it exit cleanly
+x advance initial frames on load
+x dont crash on blank camera frames entry
+x install newer python on old laptop
+x get stuff running on old laptop
+x relabel ‘edit’ to ‘reset’ (and add ‘current frame’ to label) (deemphasized instead)
+x put manual buttons directly in the widget
+x always start at zero
+x relabel manual control
+x make the window resizeable
+x add replace reel defaults
+x fix any other blank entry crash
+x add ui for many cycles
+x fix the program feature
+x add ui for adding projector and camera actions
+x camera action
+x projector action
+x make steps removable
+x run program
+x disable ui while running run button, good enough
+x camera: global direction, only step
+
+   update step numbers when steps are removed
+   fix progress bar for tk
+   collect all font references to stop buggy font blahs
+   make takeup reel tension setting configurable
+
+   program: indicate which step is running
+   program: compute total frames
+
+   manage serial connections inside gui
+   pause & continue feature?
+   indicate which step was the last one before cancelling?
+   start from arbitrary step?
+
+…
+   reverse & reshoot feature?
+   epoxy the relay board inside k103
+   get cover plate for old connector on k130
+   replace dram battery in powerbook
+      => or maybe add rtc to box?!
+   add timeouts & microswitch error detect
+```
